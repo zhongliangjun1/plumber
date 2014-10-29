@@ -1,5 +1,7 @@
 package com.dianping.plumber.view;
 
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * Author: liangjun.zhong
@@ -9,6 +11,6 @@ package com.dianping.plumber.view;
  */
 public interface ViewRenderer {
 
-    public String render();
+    public String render(String viewName, String viewSource, Map<String, Object> modelForView);
 
 }
