@@ -1,0 +1,12 @@
+view:
+    resourcesPath: /view
+    suffix: .ftl
+    rendererFactory: com.dianping.plumber.view.ViewRendererFactory
+
+concurrent:
+    timeout: 1000
+    threadPool:
+        corePoolSize: 50
+        maximumPoolSize: 50
+        keepAliveTime: 0
+        blockingQueueCapacity: 1000
