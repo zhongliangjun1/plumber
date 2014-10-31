@@ -1,5 +1,11 @@
 package com.dianping.plumber.utils;
 
+import com.dianping.plumber.PlumberConstants;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * Created with IntelliJ IDEA.
  * Author: liangjun.zhong
@@ -8,6 +14,20 @@ package com.dianping.plumber.utils;
  * To change this template use File | Settings | File Templates.
  */
 public class StringUtils {
+
+    public static String inputStreamToString(InputStream inputStream, String encoding) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        int BUFFER_SIZE = PlumberConstants.DEFAULT_BUFFER_SIZE;
+        byte[] data = new byte[BUFFER_SIZE];
+        int count;
+        while((count = inputStream.read(data, 0, BUFFER_SIZE)) != -1)
+            outputStream.write(data, 0, count);
+
+        String str = new String(outputStream.toByteArray(), encoding);
+        inputStream.close();
+        outputStream.close();
+        return str;
+    }
 
     /**
      * <p>Checks if a String is empty ("") or null.</p>

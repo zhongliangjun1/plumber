@@ -3,7 +3,7 @@ view:
     suffix: .ftl
     encoding: UTF-8
     viewSourceLoaderFactory: com.dianping.plumber.view.ViewSourceLoaderFactory
-    viewRendererFactory: com.dianping.plumber.view.defalutImpl.FreemarkerRendererFactory
+    viewRendererFactory: com.dianping.plumber.view.supportemarkerRendererFactory
 
 concurrent:
     timeout: 1000

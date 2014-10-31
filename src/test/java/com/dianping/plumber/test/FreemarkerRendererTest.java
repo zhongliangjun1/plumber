@@ -1,6 +1,6 @@
 package com.dianping.plumber.test;
 
-import com.dianping.plumber.view.defalutImpl.FreemarkerRenderer;
+import com.dianping.plumber.view.support.FreemarkerRenderer;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -13,6 +13,8 @@ public abstract class PlumberConstants {
 
     public static final String DEFAULT_VIEW_ENCODING = "UTF-8";
 
+    public static final int DEFAULT_BUFFER_SIZE = 1024;
+
 
 
 }
