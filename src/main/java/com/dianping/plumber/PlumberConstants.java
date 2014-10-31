@@ -11,6 +11,8 @@ public abstract class PlumberConstants {
 
     public static final String CONFIG_PATH = "/plumber.yaml";
 
+    public static final String DEFAULT_VIEW_ENCODING = "UTF-8";
+
 
 
 }

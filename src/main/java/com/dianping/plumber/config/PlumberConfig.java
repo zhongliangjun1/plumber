@@ -6,12 +6,12 @@ import java.io.InputStream;
 /**
  * @author ltebean
  */
-public class Configuration {
+public class PlumberConfig {
 
     private static final Yaml yaml;
 
     static{
-        InputStream input = Configuration.class.getResourceAsStream(PlumberConstants.CONFIG_PATH);
+        InputStream input = PlumberConfig.class.getResourceAsStream(PlumberConstants.CONFIG_PATH);
         yaml = new Yaml(input);
     }
 

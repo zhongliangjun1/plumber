@@ -1,7 +1,9 @@
 view:
     resourcesPath: /view
     suffix: .ftl
-    rendererFactory: com.dianping.plumber.view.ViewRendererFactory
+    encoding: UTF-8
+    viewSourceLoaderFactory: com.dianping.plumber.view.ViewSourceLoaderFactory
+    viewRendererFactory: com.dianping.plumber.view.defalutImpl.FreemarkerRendererFactory
 
 concurrent:
     timeout: 1000
