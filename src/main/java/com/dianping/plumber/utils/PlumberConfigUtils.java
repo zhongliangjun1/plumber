@@ -13,11 +13,7 @@ import com.dianping.plumber.core.PlumberGlobals;
 public class PlumberConfigUtils {
 
     public static String getViewEncoding() {
-        String encoding = PlumberConfig.get("view.encoding", String.class);
-        if (StringUtils.isEmpty(encoding)) {
-            encoding = PlumberGlobals.DEFAULT_VIEW_ENCODING;
-        }
-        return encoding;
+        return PlumberConfig.get("view.encoding", PlumberGlobals.DEFAULT_VIEW_ENCODING, String.class);
     }
 
     public static String getViewResourcesPath() {

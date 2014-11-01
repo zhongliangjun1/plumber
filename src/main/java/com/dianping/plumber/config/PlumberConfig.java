@@ -16,13 +16,12 @@ public class PlumberConfig {
         yaml = new Yaml(input);
     }
 
-
     public static <T> T get(String expression,Class<T> clazz){
-        return yaml.get(expression,clazz);
+        return yaml.get(expression, clazz);
     }
 
     public static <T> T get(String expression, T defaultValue, Class<T> clazz){
-        return yaml.get(expression,defaultValue,clazz);
+        return yaml.get(expression, defaultValue, clazz);
     }
 
 }
