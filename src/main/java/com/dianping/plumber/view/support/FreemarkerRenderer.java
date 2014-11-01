@@ -1,6 +1,6 @@
 package com.dianping.plumber.view.support;
 
-import com.dianping.plumber.core.PlumberConstants;
+import com.dianping.plumber.core.PlumberGlobals;
 import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.utils.StringUtils;
 import com.dianping.plumber.view.ViewRenderer;
@@ -55,7 +55,7 @@ public class FreemarkerRenderer implements ViewRenderer {
     private String getViewEncoding() {
         String encoding = PlumberConfig.get("view.encoding", String.class);
         if (StringUtils.isEmpty(encoding)) {
-            encoding = PlumberConstants.DEFAULT_VIEW_ENCODING;
+            encoding = PlumberGlobals.DEFAULT_VIEW_ENCODING;
         }
         return encoding;
     }

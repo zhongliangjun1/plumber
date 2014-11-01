@@ -1,6 +1,7 @@
 package com.dianping.plumber.config;
 
-import com.dianping.plumber.core.PlumberConstants;
+import com.dianping.plumber.core.PlumberGlobals;
+
 import java.io.InputStream;
 
 /**
@@ -11,7 +12,7 @@ public class PlumberConfig {
     private static final Yaml yaml;
 
     static{
-        InputStream input = PlumberConfig.class.getResourceAsStream(PlumberConstants.CONFIG_PATH);
+        InputStream input = PlumberConfig.class.getResourceAsStream(PlumberGlobals.CONFIG_PATH);
         yaml = new Yaml(input);
     }
 

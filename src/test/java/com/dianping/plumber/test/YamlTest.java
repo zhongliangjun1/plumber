@@ -1,6 +1,6 @@
 package com.dianping.plumber.test;
 
-import com.dianping.plumber.core.PlumberConstants;
+import com.dianping.plumber.core.PlumberGlobals;
 import com.dianping.plumber.config.Yaml;
 import com.dianping.plumber.utils.ResourceUtils;
 
@@ -15,7 +15,7 @@ import com.dianping.plumber.utils.ResourceUtils;
 public class YamlTest {
 
     public static void main(String[] args) throws Exception {
-        String text = ResourceUtils.getResourceFromClassPath(PlumberConstants.CONFIG_PATH, "UTF-8");
+        String text = ResourceUtils.getResourceFromClassPath(PlumberGlobals.CONFIG_PATH, "UTF-8");
         Yaml yaml = new Yaml(text);
         String resourcesPath = yaml.get("view.resourcesPath", String.class);
         String suffix = yaml.get("view.suffix", String.class);

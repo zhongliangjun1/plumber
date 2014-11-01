@@ -5,12 +5,12 @@ import java.util.Map;
 /**
  * Created with IntelliJ IDEA.
  * Author: liangjun.zhong
- * Date: 14-10-28
- * Time: PM10:53
+ * Date: 14-11-1
+ * Time: PM10:46
  * To change this template use File | Settings | File Templates.
  */
-public interface PlumberBusiness {
+public abstract class PlumberController {
 
-    public ResultType execute(Map<String, Object> modelForView);
+    public abstract ResultType execute(Map<String, Object> modelForView);
 
 }

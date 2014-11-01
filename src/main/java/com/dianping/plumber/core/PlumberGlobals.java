@@ -7,7 +7,7 @@ package com.dianping.plumber.core;
  * Time: PM11:19
  * To change this template use File | Settings | File Templates.
  */
-public abstract class PlumberConstants {
+public abstract class PlumberGlobals {
 
     public static final String CONFIG_PATH = "/plumber.yaml";
 

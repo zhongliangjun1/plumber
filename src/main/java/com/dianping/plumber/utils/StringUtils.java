@@ -1,6 +1,6 @@
 package com.dianping.plumber.utils;
 
-import com.dianping.plumber.core.PlumberConstants;
+import com.dianping.plumber.core.PlumberGlobals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class StringUtils {
 
     public static String inputStreamToString(InputStream inputStream, String encoding) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        int BUFFER_SIZE = PlumberConstants.DEFAULT_BUFFER_SIZE;
+        int BUFFER_SIZE = PlumberGlobals.DEFAULT_BUFFER_SIZE;
         byte[] data = new byte[BUFFER_SIZE];
         int count;
         while((count = inputStream.read(data, 0, BUFFER_SIZE)) != -1)
