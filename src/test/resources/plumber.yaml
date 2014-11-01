@@ -1,4 +1,5 @@
 view:
+    resourcesLocation: classpath
     resourcesPath: /view
     suffix: .ftl
     encoding: UTF-8
