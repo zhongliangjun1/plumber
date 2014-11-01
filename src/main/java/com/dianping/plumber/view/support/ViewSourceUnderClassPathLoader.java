@@ -1,8 +1,8 @@
 package com.dianping.plumber.view.support;
 
 import com.dianping.plumber.core.PlumberGlobals;
-import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.exception.ViewSourceNotFoundException;
+import com.dianping.plumber.utils.PlumberConfigUtils;
 import com.dianping.plumber.utils.ResourceUtils;
 import com.dianping.plumber.utils.StringUtils;
 import com.dianping.plumber.view.ViewSourceLoader;
@@ -21,11 +21,11 @@ public class ViewSourceUnderClassPathLoader implements ViewSourceLoader {
     @Override
     public String load(String viewName) {
 
-        String path = PlumberConfig.get("view.resourcesPath", String.class)
+        String path = PlumberConfigUtils.getViewResourcesPath()
                 + "/" + viewName
-                + PlumberConfig.get("view.suffix", String.class);
+                + PlumberConfigUtils.getViewSuffix();
 
-        String encoding = PlumberConfig.get("view.encoding", String.class);
+        String encoding = PlumberConfigUtils.getViewEncoding();
         if (StringUtils.isEmpty(encoding)) {
             encoding = PlumberGlobals.DEFAULT_VIEW_ENCODING;
         }

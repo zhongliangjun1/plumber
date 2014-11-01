@@ -6,6 +6,10 @@ view:
     viewSourceLoaderFactory: com.dianping.plumber.view.ViewSourceLoaderFactory
     viewRendererFactory: com.dianping.plumber.view.supportemarkerRendererFactory
 
+business:
+    controllersPackageScan:
+    pipesPackageScan:
+
 concurrent:
     timeout: 1000
     threadPool:

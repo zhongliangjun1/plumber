@@ -1,7 +1,6 @@
 package com.dianping.plumber.view.support;
 
-import com.dianping.plumber.core.PlumberGlobals;
-import com.dianping.plumber.config.PlumberConfig;
+import com.dianping.plumber.utils.PlumberConfigUtils;
 import com.dianping.plumber.utils.StringUtils;
 import com.dianping.plumber.view.ViewRenderer;
 import freemarker.template.Configuration;
@@ -43,21 +42,13 @@ public class FreemarkerRenderer implements ViewRenderer {
             Configuration config = new Configuration();
             BufferedReader reader = new BufferedReader(new StringReader(viewSource));
             try {
-                template = new Template(null, reader, config, getViewEncoding());
+                template = new Template(null, reader, config, PlumberConfigUtils.getViewEncoding());
                 templateCache.put(viewName, template);
             } catch(Exception e){
                 logger.error(e);
             }
         }
         return template;
-    }
-
-    private String getViewEncoding() {
-        String encoding = PlumberConfig.get("view.encoding", String.class);
-        if (StringUtils.isEmpty(encoding)) {
-            encoding = PlumberGlobals.DEFAULT_VIEW_ENCODING;
-        }
-        return encoding;
     }
 
     private String getRenderResult(Template template, Map<String, Object> modelForView) {
