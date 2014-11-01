@@ -16,10 +16,11 @@ public abstract class PlumberController {
      * then execute its business logic to fill the modelForView.
      * View of this Controller will be the first time response send to client,
      * you can also set pipe's required attribute to be true ,then it will be sent with this view.
+     * @param paramsFromRequest
      * @param paramsForPipes
      * @param modelForView
      * @return
      */
-    public abstract ResultType execute(Map<String, Object> paramsForPipes, Map<String, Object> modelForView);
+    public abstract ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsForPipes, Map<String, Object> modelForView);
 
 }
