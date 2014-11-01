@@ -1,6 +1,6 @@
 package com.dianping.plumber.view.support;
 
-import com.dianping.plumber.PlumberConstants;
+import com.dianping.plumber.core.PlumberConstants;
 import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.exception.ViewSourceNotFoundException;
 import com.dianping.plumber.utils.ResourceUtils;

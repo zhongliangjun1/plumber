@@ -1,4 +1,4 @@
-package com.dianping.plumber;
+package com.dianping.plumber.core;
 
 import java.util.Map;
 

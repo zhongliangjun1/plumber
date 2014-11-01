@@ -1,6 +1,6 @@
 package com.dianping.plumber.test;
 
-import com.dianping.plumber.PlumberConstants;
+import com.dianping.plumber.core.PlumberConstants;
 import com.dianping.plumber.config.Yaml;
 import com.dianping.plumber.utils.ResourceUtils;
 

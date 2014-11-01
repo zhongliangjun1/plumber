@@ -1,6 +1,6 @@
 package com.dianping.plumber.utils;
 
-import com.dianping.plumber.PlumberConstants;
+import com.dianping.plumber.core.PlumberConstants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
