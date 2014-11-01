@@ -11,6 +11,15 @@ import java.util.Map;
  */
 public abstract class PlumberController {
 
-    public abstract ResultType execute(Map<String, Object> modelForView);
+    /**
+     * entrance of request. Controller should prepare common params for its pipes ,
+     * then execute its business logic to fill the modelForView.
+     * View of this Controller will be the first time response send to client,
+     * you can also set pipe's required attribute to be true ,then it will be sent with this view.
+     * @param paramsForPipes
+     * @param modelForView
+     * @return
+     */
+    public abstract ResultType execute(Map<String, Object> paramsForPipes, Map<String, Object> modelForView);
 
 }

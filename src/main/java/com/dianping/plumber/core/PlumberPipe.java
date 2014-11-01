@@ -17,7 +17,7 @@ public abstract class PlumberPipe  {
     private boolean required;
 
 
-    public abstract ResultType execute(Map<String, Object> params, Map<String, Object> modelForView);
+    public abstract ResultType execute(Map<String, Object> paramsFromController, Map<String, Object> modelForView);
 
 
     /**
