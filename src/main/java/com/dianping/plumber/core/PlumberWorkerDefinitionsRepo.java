@@ -1,10 +1,15 @@
 package com.dianping.plumber.core;
 
+import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.exception.PlumberInitializeFailureException;
+import com.dianping.plumber.view.ViewSourceLoader;
+import com.dianping.plumber.view.ViewSourceLoaderFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,6 +22,19 @@ public class PlumberWorkerDefinitionsRepo {
 
     private final static List<String> controllerNames = new ArrayList<String>();
     private final static List<String> pipeNames = new ArrayList<String>();
+    private final static Map<String, PlumberControllerDefinition> controllerDefinitionsRepo = new HashMap<String, PlumberControllerDefinition>();
+    private final static Map<String, PlumberPipeDefinition> pipeDefinitionsRepo = new HashMap<String, PlumberPipeDefinition>();
+
+    private static ViewSourceLoader viewSourceLoader;
+
+    static {
+        try {
+            ViewSourceLoaderFactory viewSourceLoaderFactory = (ViewSourceLoaderFactory) Class.forName(PlumberConfig.getViewSourceLoaderFactory()).newInstance();
+            viewSourceLoader = viewSourceLoaderFactory.getSourceLoader();
+        } catch (Exception e) {
+            throw new PlumberInitializeFailureException("prepare viewSourceLoader failure", e);
+        }
+    }
 
     public static void controllerRegister(String name) {
         if ( !controllerNames.contains(name) ) {
@@ -38,12 +56,29 @@ public class PlumberWorkerDefinitionsRepo {
     }
 
     private static void preparePipeDefinitions(ApplicationContext applicationContext) {
-        if ( controllerNames.size()>0 ) {
-            for (String pipeName : pipeNames) {
-                PlumberPipe plumberPipe = (PlumberPipe) applicationContext.getBean(pipeName);
+        try {
+            if ( controllerNames.size()>0 ) {
+                for (String pipeName : pipeNames) {
+                    if ( pipeDefinitionsRepo.get(pipeName)==null ) {
+                        PlumberPipeDefinition pipeDefinition = new PlumberPipeDefinition();
+                        pipeDefinition.setPipeName(pipeName);
+
+                        PlumberPipe plumberPipe = (PlumberPipe) applicationContext.getBean(pipeName);
+                        boolean isRequired = plumberPipe.isRequired();
+                        pipeDefinition.setRequired(isRequired);
+
+                        String viewName = pipeName;
+                        pipeDefinition.setViewName(viewName);
+                        String viewSource = viewSourceLoader.load(viewName);
+                        pipeDefinition.setViewSource(viewSource);
+                    }
+                }
             }
+        } catch (Exception e) {
+            throw new PlumberInitializeFailureException("preparePipeDefinitions failure", e);
         }
     }
+
 
     private static void prepareControllerDefinitions(ApplicationContext applicationContext) {
 
