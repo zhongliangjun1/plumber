@@ -2,6 +2,8 @@ package com.dianping.plumber.core;
 
 import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.exception.PlumberInitializeFailureException;
+import com.dianping.plumber.utils.CollectionUtils;
+import com.dianping.plumber.view.ViewParser;
 import com.dianping.plumber.view.ViewSourceLoader;
 import com.dianping.plumber.view.ViewSourceLoaderFactory;
 import org.springframework.context.ApplicationContext;
@@ -94,6 +96,17 @@ public class PlumberWorkerDefinitionsRepo {
                         controllerDefinition.setViewName(viewName);
                         String viewSource = viewSourceLoader.load(viewName);
                         controllerDefinition.setViewSource(viewSource);
+
+                        List<String> pipeNames = ViewParser.recognizePipeNames(viewSource);
+                        if ( !CollectionUtils.isEmpty(pipeNames) ) {
+                            List<PlumberPipeDefinition> pipeDefinitions = new ArrayList<PlumberPipeDefinition>();
+                            for (String pipeName : pipeNames) {
+                                PlumberPipeDefinition pipeDefinition = pipeDefinitionsRepo.get(pipeName);
+                                pipeDefinitions.add(pipeDefinition);
+                            }
+                            controllerDefinition.setPipeNames(pipeNames);
+                            controllerDefinition.setPipeDefinitions(pipeDefinitions);
+                        }
 
                         controllerDefinitionsRepo.put(controllerName, controllerDefinition);
                     }
