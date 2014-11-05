@@ -1,5 +1,8 @@
 package com.dianping.plumber.core;
 
+import com.dianping.plumber.exception.PlumberInitializeFailureException;
+import org.springframework.context.ApplicationContext;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,8 +15,8 @@ import java.util.List;
  */
 public class PlumberWorkerDefinitionsRepo {
 
-    private static List<String> controllerNames = new ArrayList<String>();
-    private static List<String> pipeNames = new ArrayList<String>();
+    private final static List<String> controllerNames = new ArrayList<String>();
+    private final static List<String> pipeNames = new ArrayList<String>();
 
     public static void controllerRegister(String name) {
         if ( !controllerNames.contains(name) ) {
@@ -25,6 +28,25 @@ public class PlumberWorkerDefinitionsRepo {
         if ( !pipeNames.contains(name) ) {
             pipeNames.add(name);
         }
+    }
+
+    public static void prepareWorkerDefinitions(ApplicationContext applicationContext) {
+        if ( applicationContext==null )
+            throw new PlumberInitializeFailureException("applicationContext is null !");
+        preparePipeDefinitions(applicationContext);
+        prepareControllerDefinitions(applicationContext);
+    }
+
+    private static void preparePipeDefinitions(ApplicationContext applicationContext) {
+        if ( controllerNames.size()>0 ) {
+            for (String pipeName : pipeNames) {
+                PlumberPipe plumberPipe = (PlumberPipe) applicationContext.getBean(pipeName);
+            }
+        }
+    }
+
+    private static void prepareControllerDefinitions(ApplicationContext applicationContext) {
+
     }
 
 }

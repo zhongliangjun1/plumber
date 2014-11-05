@@ -7,7 +7,7 @@ package com.dianping.plumber.exception;
  * Time: AM2:16
  * To change this template use File | Settings | File Templates.
  */
-public class PlumberControllerNotFoundException extends PlumberInitializeFailureException {
+public class PlumberControllerNotFoundException extends RuntimeException {
     private static final long serialVersionUID = -4783103032962075203L;
 
     public PlumberControllerNotFoundException() {

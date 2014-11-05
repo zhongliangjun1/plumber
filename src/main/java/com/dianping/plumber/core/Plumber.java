@@ -43,47 +43,64 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
         }
         return controller;
     }
+
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+        prepareWorkerDefinitions(applicationContext);
     }
 
+
+
+    private static volatile boolean hasPrepared = false;
+    /**
+     * prepare definitions of PlumberController and PlumberPipe
+     * @param applicationContext
+     */
+    public static void prepareWorkerDefinitions(ApplicationContext applicationContext) {
+        if ( !hasPrepared ) {
+            PlumberWorkerDefinitionsRepo.prepareWorkerDefinitions(applicationContext);
+        }
+    }
 
 
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        resetPlumberWorkerDefinitionsAndRegister(beanFactory);
+        resetPlumberWorkerScopeAndRegister(beanFactory);
     }
 
     private static volatile boolean hasReset = false;
     /**
      * reset PlumberController and PlumberPipe scope to be prototype
-     * and
+     * make sure Plumber to be singleton
      * register them to plumberWorkerDefinitionsRepo
      * @param beanFactory
      */
-    private static void resetPlumberWorkerDefinitionsAndRegister(ConfigurableListableBeanFactory beanFactory) {
+    private static void resetPlumberWorkerScopeAndRegister(ConfigurableListableBeanFactory beanFactory) {
         if ( !hasReset ) {
             hasReset = true;
             String[] beanDefinitionNames = beanFactory.getBeanDefinitionNames();
             if (beanDefinitionNames!=null && beanDefinitionNames.length>0) {
                 for (String beanDefinitionName : beanDefinitionNames) {
                     BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDefinitionName);
+                    String beanClassName = beanDefinition.getBeanClassName();
                     if ( beanDefinition.isSingleton() ) {
-                        String beanClassName = beanDefinition.getBeanClassName();
                         try {
                             Class c = Class.forName(beanClassName);
                             if ( PlumberController.class.isAssignableFrom(c) ) {
-                                beanDefinition.setScope("prototype"); // reset
+                                beanDefinition.setScope("prototype"); // reset PlumberController scope
                                 PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName); // register
                             } else if ( PlumberPipe.class.isAssignableFrom(c) ) {
-                                beanDefinition.setScope("prototype"); // reset
+                                beanDefinition.setScope("prototype"); // reset PlumberPipe scope
                                 PlumberWorkerDefinitionsRepo.pipeRegister(beanDefinitionName); // register
                             }
                         } catch (ClassNotFoundException e) {
                             throw new PlumberInitializeFailureException(e);
                         }
+                    } else if ( "com.dianping.plumber.core.Plumber".equals(beanClassName) ) {
+                        beanDefinition.setScope("singleton"); // reset Plumber scope
                     }
                 }
             }
