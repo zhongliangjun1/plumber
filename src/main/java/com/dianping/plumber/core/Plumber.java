@@ -45,20 +45,19 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
     }
 
 
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
         prepareWorkerDefinitions(applicationContext);
     }
 
-
-
     private static volatile boolean hasPrepared = false;
     /**
      * prepare definitions of PlumberController and PlumberPipe
      * @param applicationContext
      */
-    public static void prepareWorkerDefinitions(ApplicationContext applicationContext) {
+    private static void prepareWorkerDefinitions(ApplicationContext applicationContext) {
         if ( !hasPrepared ) {
             PlumberWorkerDefinitionsRepo.prepareWorkerDefinitions(applicationContext);
         }
