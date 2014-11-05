@@ -71,17 +71,37 @@ public class PlumberWorkerDefinitionsRepo {
                         pipeDefinition.setViewName(viewName);
                         String viewSource = viewSourceLoader.load(viewName);
                         pipeDefinition.setViewSource(viewSource);
+
+                        pipeDefinitionsRepo.put(pipeName, pipeDefinition);
                     }
                 }
             }
         } catch (Exception e) {
-            throw new PlumberInitializeFailureException("preparePipeDefinitions failure", e);
+            throw new PlumberInitializeFailureException("prepare pipeDefinitions failure", e);
         }
     }
 
 
     private static void prepareControllerDefinitions(ApplicationContext applicationContext) {
+        try {
+            if ( controllerNames.size()>0 ) {
+                for (String controllerName : controllerNames) {
+                    if ( controllerDefinitionsRepo.get(controllerName)==null ) {
+                        PlumberControllerDefinition controllerDefinition = new PlumberControllerDefinition();
+                        controllerDefinition.setControllerName(controllerName);
 
+                        String viewName = controllerName;
+                        controllerDefinition.setViewName(viewName);
+                        String viewSource = viewSourceLoader.load(viewName);
+                        controllerDefinition.setViewSource(viewSource);
+
+                        controllerDefinitionsRepo.put(controllerName, controllerDefinition);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new PlumberInitializeFailureException("prepare controllerDefinitions failure", e);
+        }
     }
 
 }
