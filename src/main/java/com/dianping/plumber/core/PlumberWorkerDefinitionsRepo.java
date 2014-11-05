@@ -54,7 +54,7 @@ public class PlumberWorkerDefinitionsRepo {
         if ( applicationContext==null )
             throw new PlumberInitializeFailureException("applicationContext is null !");
         preparePipeDefinitions(applicationContext);
-        prepareControllerDefinitions(applicationContext);
+        prepareControllerDefinitions();
     }
 
     private static void preparePipeDefinitions(ApplicationContext applicationContext) {
@@ -84,7 +84,7 @@ public class PlumberWorkerDefinitionsRepo {
     }
 
 
-    private static void prepareControllerDefinitions(ApplicationContext applicationContext) {
+    private static void prepareControllerDefinitions() {
         try {
             if ( controllerNames.size()>0 ) {
                 for (String controllerName : controllerNames) {
