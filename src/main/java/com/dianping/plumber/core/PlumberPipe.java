@@ -11,23 +11,11 @@ import java.util.Map;
  */
 public abstract class PlumberPipe  {
 
-    /**
-     * is required to be responded at first
-     */
-    private boolean required;
-
-
     public abstract ResultType execute(Map<String, Object> paramsFromController, Map<String, Object> modelForView);
-
 
     /**
      * is required to be responded at first of this pipe
      */
-    public boolean isRequired() {
-        return required;
-    }
+    public abstract boolean isRequired();
 
-    public void setRequired(boolean required) {
-        this.required = required;
-    }
 }

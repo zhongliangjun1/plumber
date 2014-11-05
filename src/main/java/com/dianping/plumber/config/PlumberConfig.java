@@ -23,6 +23,10 @@ public class PlumberConfig {
         return Configuration.get("view.suffix", String.class);
     }
 
+    public static String getViewSourceLoaderFactory() {
+        return Configuration.get("view.viewSourceLoaderFactory", String.class);
+    }
+
 
 
 }

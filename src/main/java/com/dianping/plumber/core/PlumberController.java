@@ -15,7 +15,7 @@ public abstract class PlumberController {
      * entrance of request. Controller should prepare common params for its pipes ,
      * then execute its business logic to fill the modelForView.
      * View of this Controller will be the first time response send to client,
-     * you can also set pipe's required attribute to be true ,then it will be sent with this view.
+     * you can also set pipe to be required ,then it will be sent with this view.
      * @param paramsFromRequest
      * @param paramsForPipes
      * @param modelForView
