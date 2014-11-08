@@ -3,10 +3,11 @@ package com.dianping.plumber.core;
 /**
  * Created with IntelliJ IDEA.
  * Author: liangjun.zhong
- * Date: 14-11-5
- * Time: PM3:40
+ * Date: 14-11-9
+ * Time: AM12:11
  * To change this template use File | Settings | File Templates.
  */
-public class PlumberPipeDefinition extends PlumberPageletDefinition {
+public class PlumberBarrierDefinition extends PlumberPageletDefinition {
+
 
 }

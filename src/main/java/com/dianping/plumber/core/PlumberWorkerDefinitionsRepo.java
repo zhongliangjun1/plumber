@@ -6,7 +6,6 @@ import com.dianping.plumber.utils.CollectionUtils;
 import com.dianping.plumber.view.ViewParser;
 import com.dianping.plumber.view.ViewSourceLoader;
 import com.dianping.plumber.view.ViewSourceLoaderFactory;
-import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,8 +23,10 @@ public class PlumberWorkerDefinitionsRepo {
 
     private final static List<String> controllerNames = new ArrayList<String>();
     private final static List<String> pipeNames = new ArrayList<String>();
+    private final static List<String> barrierNames = new ArrayList<String>();
     private final static Map<String, PlumberControllerDefinition> controllerDefinitionsRepo = new HashMap<String, PlumberControllerDefinition>();
     private final static Map<String, PlumberPipeDefinition> pipeDefinitionsRepo = new HashMap<String, PlumberPipeDefinition>();
+    private final static Map<String, PlumberBarrierDefinition> barrierDefinitionsRepo = new HashMap<String, PlumberBarrierDefinition>();
 
     private static ViewSourceLoader viewSourceLoader;
 
@@ -50,27 +51,49 @@ public class PlumberWorkerDefinitionsRepo {
         }
     }
 
-    public static void prepareWorkerDefinitions(ApplicationContext applicationContext) {
-        if ( applicationContext==null )
-            throw new PlumberInitializeFailureException("applicationContext is null !");
-        preparePipeDefinitions(applicationContext);
+    public static void barrierRegister(String name) {
+        if ( !barrierNames.contains(name) ) {
+            barrierNames.add(name);
+        }
+    }
+
+
+    public static void prepareWorkerDefinitions() {
+        prepareBarrierDefinitions();
+        preparePipeDefinitions();
         prepareControllerDefinitions();
     }
 
-    private static void preparePipeDefinitions(ApplicationContext applicationContext) {
+    private static void prepareBarrierDefinitions() {
         try {
-            if ( controllerNames.size()>0 ) {
+            if ( barrierNames.size()>0 ) {
+                for (String barrierName : barrierNames) {
+                    if ( barrierDefinitionsRepo.get(barrierName)==null ) {
+                        PlumberBarrierDefinition barrierDefinition = new PlumberBarrierDefinition();
+                        barrierDefinition.setName(barrierName);
+
+                        String viewName = barrierName;
+                        String viewSource = viewSourceLoader.load(viewName);
+                        barrierDefinition.setViewSource(viewSource);
+
+                        barrierDefinitionsRepo.put(barrierName, barrierDefinition);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new PlumberInitializeFailureException("prepare barrierDefinition failure", e);
+        }
+    }
+
+    private static void preparePipeDefinitions() {
+        try {
+            if ( pipeNames.size()>0 ) {
                 for (String pipeName : pipeNames) {
                     if ( pipeDefinitionsRepo.get(pipeName)==null ) {
                         PlumberPipeDefinition pipeDefinition = new PlumberPipeDefinition();
-                        pipeDefinition.setPipeName(pipeName);
-
-                        PlumberPipe plumberPipe = (PlumberPipe) applicationContext.getBean(pipeName);
-                        boolean isRequired = plumberPipe.isRequired();
-                        pipeDefinition.setRequired(isRequired);
+                        pipeDefinition.setName(pipeName);
 
                         String viewName = pipeName;
-                        pipeDefinition.setViewName(viewName);
                         String viewSource = viewSourceLoader.load(viewName);
                         pipeDefinition.setViewSource(viewSource);
 
@@ -90,12 +113,22 @@ public class PlumberWorkerDefinitionsRepo {
                 for (String controllerName : controllerNames) {
                     if ( controllerDefinitionsRepo.get(controllerName)==null ) {
                         PlumberControllerDefinition controllerDefinition = new PlumberControllerDefinition();
-                        controllerDefinition.setControllerName(controllerName);
+                        controllerDefinition.setName(controllerName);
 
                         String viewName = controllerName;
-                        controllerDefinition.setViewName(viewName);
                         String viewSource = viewSourceLoader.load(viewName);
                         controllerDefinition.setViewSource(viewSource);
+
+                        List<String> barrierNames = ViewParser.recognizeBarrierNames(viewSource);
+                        if ( !CollectionUtils.isEmpty(barrierNames) ) {
+                            List<PlumberBarrierDefinition> barrierDefinitions = new ArrayList<PlumberBarrierDefinition>();
+                            for (String barrierName : barrierNames) {
+                                PlumberBarrierDefinition barrierDefinition = barrierDefinitionsRepo.get(barrierName);
+                                barrierDefinitions.add(barrierDefinition);
+                            }
+                            controllerDefinition.setBarrierNames(barrierNames);
+                            controllerDefinition.setBarrierDefinitions(barrierDefinitions);
+                        }
 
                         List<String> pipeNames = ViewParser.recognizePipeNames(viewSource);
                         if ( !CollectionUtils.isEmpty(pipeNames) ) {

@@ -49,30 +49,20 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-        prepareWorkerDefinitions(applicationContext);
     }
 
-    private static volatile boolean hasPrepared = false;
-    /**
-     * prepare definitions of PlumberController and PlumberPipe
-     * @param applicationContext
-     */
-    private static void prepareWorkerDefinitions(ApplicationContext applicationContext) {
-        if ( !hasPrepared ) {
-            PlumberWorkerDefinitionsRepo.prepareWorkerDefinitions(applicationContext);
-        }
-    }
 
 
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         resetPlumberWorkerScopeAndRegister(beanFactory);
+        prepareWorkerDefinitions();
     }
 
     private static volatile boolean hasReset = false;
     /**
-     * reset PlumberController and PlumberPipe scope to be prototype
+     * reset PlumberPipe PlumberBarrier and PlumberController scope to be prototype
      * make sure Plumber to be singleton
      * register them to plumberWorkerDefinitionsRepo
      * @param beanFactory
@@ -90,10 +80,13 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
                             Class c = Class.forName(beanClassName);
                             if ( PlumberController.class.isAssignableFrom(c) ) {
                                 beanDefinition.setScope("prototype"); // reset PlumberController scope
-                                PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName); // register
+                                PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName);
                             } else if ( PlumberPipe.class.isAssignableFrom(c) ) {
                                 beanDefinition.setScope("prototype"); // reset PlumberPipe scope
-                                PlumberWorkerDefinitionsRepo.pipeRegister(beanDefinitionName); // register
+                                PlumberWorkerDefinitionsRepo.pipeRegister(beanDefinitionName);
+                            } else if ( PlumberBarrier.class.isAssignableFrom(c) ) {
+                                beanDefinition.setScope("prototype"); // reset PlumberBarrier scope
+                                PlumberWorkerDefinitionsRepo.barrierRegister(beanDefinitionName);
                             }
                         } catch (ClassNotFoundException e) {
                             throw new PlumberInitializeFailureException(e);
@@ -103,6 +96,16 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
                     }
                 }
             }
+        }
+    }
+
+    private static volatile boolean hasPrepared = false;
+    /**
+     * prepare definitions of PlumberPipe PlumberBarrier and PlumberController
+     */
+    private static void prepareWorkerDefinitions() {
+        if ( !hasPrepared ) {
+            PlumberWorkerDefinitionsRepo.prepareWorkerDefinitions();
         }
     }
 

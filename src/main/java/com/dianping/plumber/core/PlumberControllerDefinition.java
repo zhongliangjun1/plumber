@@ -11,27 +11,40 @@ import java.util.List;
  */
 public class PlumberControllerDefinition {
 
-    private String controllerName;
-    private String viewName;
+    private String name;
     private String viewSource;
+
+    private List<String> barrierNames;
+    private List<PlumberBarrierDefinition> barrierDefinitions;
 
     private List<String> pipeNames;
     private List<PlumberPipeDefinition> pipeDefinitions;
 
-    public String getControllerName() {
-        return controllerName;
+
+
+
+    public List<String> getBarrierNames() {
+        return barrierNames;
     }
 
-    public void setControllerName(String controllerName) {
-        this.controllerName = controllerName;
+    public void setBarrierNames(List<String> barrierNames) {
+        this.barrierNames = barrierNames;
     }
 
-    public String getViewName() {
-        return viewName;
+    public List<PlumberBarrierDefinition> getBarrierDefinitions() {
+        return barrierDefinitions;
     }
 
-    public void setViewName(String viewName) {
-        this.viewName = viewName;
+    public void setBarrierDefinitions(List<PlumberBarrierDefinition> barrierDefinitions) {
+        this.barrierDefinitions = barrierDefinitions;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getViewSource() {
