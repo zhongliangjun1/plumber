@@ -17,10 +17,10 @@ public abstract class PlumberController {
      * View of this Controller will be the first time response send to client,
      * you can also set pipe to be required ,then it will be sent with this view.
      * @param paramsFromRequest
-     * @param paramsForPipes
+     * @param paramsForPagelets
      * @param modelForView
      * @return
      */
-    public abstract ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsForPipes, Map<String, Object> modelForView);
+    public abstract ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsForPagelets, Map<String, Object> modelForView);
 
 }

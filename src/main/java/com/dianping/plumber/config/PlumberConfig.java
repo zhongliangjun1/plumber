@@ -27,12 +27,16 @@ public class PlumberConfig {
         return Configuration.get("view.viewSourceLoaderFactory", String.class);
     }
 
+    public static String getViewRendererFactory() {
+        return Configuration.get("view.viewRendererFactory", String.class);
+    }
+
     public static String getPipeViewPlaceHolder() {
-        return "pb-pipe";
+        return PlumberGlobals.PIPE_VIEW_PLACEHOLDER;
     }
 
     public static String getBarrierViewPlaceHolder() {
-        return "pb-barrier";
+        return PlumberGlobals.BARRIER_VIEW_PLACEHOLDER;
     }
 
 

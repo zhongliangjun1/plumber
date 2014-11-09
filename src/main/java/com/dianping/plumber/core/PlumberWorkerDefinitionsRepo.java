@@ -1,11 +1,11 @@
 package com.dianping.plumber.core;
 
 import com.dianping.plumber.config.PlumberConfig;
+import com.dianping.plumber.exception.PlumberControllerNotFoundException;
 import com.dianping.plumber.exception.PlumberInitializeFailureException;
 import com.dianping.plumber.utils.CollectionUtils;
-import com.dianping.plumber.view.ViewParser;
-import com.dianping.plumber.view.ViewSourceLoader;
-import com.dianping.plumber.view.ViewSourceLoaderFactory;
+import com.dianping.plumber.utils.StringUtils;
+import com.dianping.plumber.view.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +28,8 @@ public class PlumberWorkerDefinitionsRepo {
     private final static Map<String, PlumberPipeDefinition> pipeDefinitionsRepo = new HashMap<String, PlumberPipeDefinition>();
     private final static Map<String, PlumberBarrierDefinition> barrierDefinitionsRepo = new HashMap<String, PlumberBarrierDefinition>();
 
-    private static ViewSourceLoader viewSourceLoader;
+    private final static ViewSourceLoader viewSourceLoader;
+    private final static ViewRenderer viewRenderer;
 
     static {
         try {
@@ -36,6 +37,13 @@ public class PlumberWorkerDefinitionsRepo {
             viewSourceLoader = viewSourceLoaderFactory.getSourceLoader();
         } catch (Exception e) {
             throw new PlumberInitializeFailureException("prepare viewSourceLoader failure", e);
+        }
+
+        try {
+            ViewRendererFactory viewRendererFactory = (ViewRendererFactory) Class.forName(PlumberConfig.getViewRendererFactory()).newInstance();
+            viewRenderer = viewRendererFactory.getRenderer();
+        } catch (Exception e) {
+            throw new PlumberInitializeFailureException("prepare viewRenderer failure", e);
         }
     }
 
@@ -148,6 +156,23 @@ public class PlumberWorkerDefinitionsRepo {
         } catch (Exception e) {
             throw new PlumberInitializeFailureException("prepare controllerDefinitions failure", e);
         }
+    }
+
+    public static PlumberControllerDefinition getPlumberControllerDefinition(String controllerName) {
+        if ( StringUtils.isEmpty(controllerName) )
+            throw new PlumberControllerNotFoundException("illegal controllerName : "+controllerName);
+        PlumberControllerDefinition definition = controllerDefinitionsRepo.get(controllerName);
+        if ( definition==null )
+            throw new PlumberControllerNotFoundException("can not find ControllerDefinition of "+controllerName+" in controllerDefinitionsRepo");
+        return definition;
+    }
+
+    public static ViewSourceLoader getViewSourceLoader() {
+        return viewSourceLoader;
+    }
+
+    public static ViewRenderer getViewRenderer() {
+        return viewRenderer;
     }
 
 }

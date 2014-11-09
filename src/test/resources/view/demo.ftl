@@ -8,6 +8,8 @@
         <!-- this is where content will be injected -->
         <div id="main-container" pb-pipe='mainPipe'></div>
 
+        <div id="aside-container" pb-barrier='asideBarrier'>${asideBarrier}</div>
+
         <!-- this is where content will be injected -->
         <div id="foot-container"  pb-pipe ="footPipe"></div>
 

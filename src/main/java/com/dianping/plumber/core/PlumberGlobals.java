@@ -15,6 +15,8 @@ public abstract class PlumberGlobals {
 
     public static final int DEFAULT_BUFFER_SIZE = 1024;
 
+    public static final String PIPE_VIEW_PLACEHOLDER = "pb-pipe";
 
+    public static final String BARRIER_VIEW_PLACEHOLDER = "pb-barrier";
 
 }

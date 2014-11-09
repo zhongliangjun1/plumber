@@ -11,7 +11,10 @@ import org.springframework.context.ApplicationContextAware;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,11 +27,21 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
 
     private ApplicationContext applicationContext;
 
-    public void execute(String plumberControllerName, Map<String, Object> paramsForController,
+    public ResultType execute(String plumberControllerName, Map<String, Object> paramsForController,
                         HttpServletRequest request,  HttpServletResponse response) {
 
+        PlumberController controller = getPlumberController(plumberControllerName);
+        Map<String, Object> paramsForPagelets = new ConcurrentHashMap<String, Object>();
+        Map<String, Object> modelForControllerView = new HashMap<String, Object>();
+        ResultType controllerResult = controller.execute(paramsForController, paramsForPagelets, modelForControllerView);
+        if ( controllerResult!=ResultType.SUCCESS )
+            return controllerResult;
+
+        PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(plumberControllerName);
 
 
+
+        return ResultType.SUCCESS;
     }
 
 
@@ -43,6 +56,11 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
         }
         return controller;
     }
+
+//    private List<PlumberBarrier> getPlumberBarriers(PlumberControllerDefinition controllerDefinition) {
+//        List<String> barrierNames = controllerDefinition.getBarrierNames();
+//        List<PlumberBarrierDefinition> barrierDefinitions = controllerDefinition.getBarrierDefinitions();
+//    }
 
 
 
