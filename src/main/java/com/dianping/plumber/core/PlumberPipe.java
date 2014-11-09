@@ -5,7 +5,7 @@ package com.dianping.plumber.core;
  * Author: liangjun.zhong
  * Date: 14-10-28
  * Time: PM10:53
- * To change this template use File | Settings | File Templates.
+ * Pagelets to render parts of your response afterwards
  */
 public abstract class PlumberPipe implements PlumberPagelet  {
 
