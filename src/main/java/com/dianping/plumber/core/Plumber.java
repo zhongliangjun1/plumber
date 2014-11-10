@@ -2,6 +2,7 @@ package com.dianping.plumber.core;
 
 import com.dianping.plumber.exception.PlumberControllerNotFoundException;
 import com.dianping.plumber.exception.PlumberInitializeFailureException;
+import com.dianping.plumber.utils.CollectionUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,14 +32,18 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
     public ResultType execute(String plumberControllerName, Map<String, Object> paramsForController,
                         HttpServletRequest request,  HttpServletResponse response) {
 
+        // execute controller to fill modelForControllerView and prepare paramsForPagelets
         PlumberController controller = getPlumberController(plumberControllerName);
         Map<String, Object> paramsForPagelets = new ConcurrentHashMap<String, Object>();
-        Map<String, Object> modelForControllerView = new HashMap<String, Object>();
+        Map<String, Object> modelForControllerView = new ConcurrentHashMap<String, Object>();
         ResultType controllerResult = controller.execute(paramsForController, paramsForPagelets, modelForControllerView);
         if ( controllerResult!=ResultType.SUCCESS )
             return controllerResult;
 
         PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(plumberControllerName);
+        if ( !CollectionUtils.isEmpty(controllerDefinition.getBarrierNames()) ) {
+            CountDownLatch barrierLatch = new CountDownLatch(controllerDefinition.getBarrierNames().size());
+        }
 
 
 
