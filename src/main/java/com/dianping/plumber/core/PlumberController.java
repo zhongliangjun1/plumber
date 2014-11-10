@@ -1,7 +1,5 @@
 package com.dianping.plumber.core;
 
-import org.springframework.beans.factory.BeanNameAware;
-
 import java.util.Map;
 
 /**
@@ -11,9 +9,7 @@ import java.util.Map;
  * Time: PM10:46
  * To change this template use File | Settings | File Templates.
  */
-public abstract class PlumberController implements BeanNameAware {
-
-    protected String name;
+public abstract class PlumberController {
 
     /**
      * entrance of request. Controller should prepare common params for its pipes ,
@@ -26,14 +22,5 @@ public abstract class PlumberController implements BeanNameAware {
      * @return
      */
     public abstract ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsForPagelets, Map<String, Object> modelForView);
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setBeanName(String name) {
-        this.name = name;
-    }
 
 }

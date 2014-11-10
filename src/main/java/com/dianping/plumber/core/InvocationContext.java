@@ -1,6 +1,7 @@
 package com.dianping.plumber.core;
 
 import com.dianping.plumber.core.interceptors.Interceptor;
+import org.springframework.context.ApplicationContext;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,21 +15,25 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class InvocationContext {
 
-    private final PlumberController controller;
+    private final String controllerName;
     private final Map<String, Object> paramsForController;
     private final ConcurrentHashMap<String, Object> modelForControllerView;
     private final ConcurrentHashMap<String, Object> paramsForPagelets;
-
     private final Iterator<Interceptor> interceptors;
+    private final ApplicationContext applicationContext;
+
     private ResultType resultType;
     private String controllerRenderResult;
 
-    public InvocationContext(PlumberController controller, Map<String, Object> paramsForController,
+
+
+    public InvocationContext(String controllerName, ApplicationContext applicationContext, Map<String, Object> paramsForController,
                              ConcurrentHashMap<String, Object> modelForControllerView, ConcurrentHashMap<String, Object> paramsForPagelets) {
-        this.controller = controller;
+        this.controllerName = controllerName;
         this.paramsForController = paramsForController;
         this.modelForControllerView = modelForControllerView;
         this.paramsForPagelets = paramsForPagelets;
+        this.applicationContext = applicationContext;
         this.interceptors = null;
     }
 
@@ -40,8 +45,12 @@ public class InvocationContext {
         return resultType;
     }
 
-    public PlumberController getController() {
-        return controller;
+    public String getControllerName() {
+        return controllerName;
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
     }
 
     public Map<String, Object> getParamsForController() {

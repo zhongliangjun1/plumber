@@ -1,7 +1,9 @@
 package com.dianping.plumber.core.interceptors;
 
 import com.dianping.plumber.core.*;
+import com.dianping.plumber.exception.PlumberControllerNotFoundException;
 import com.dianping.plumber.view.ViewRenderer;
+import org.springframework.context.ApplicationContext;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +19,12 @@ public class ControllerInterceptor implements Interceptor {
 
     @Override
     public ResultType intercept(InvocationContext invocation) throws Exception {
-        PlumberController controller = invocation.getController();
+        String controllerName = invocation.getControllerName();
+        ApplicationContext applicationContext = invocation.getApplicationContext();
+        PlumberController controller = (PlumberController) applicationContext.getBean(controllerName);
+        if ( controller==null ) {
+            throw new PlumberControllerNotFoundException("can not find your plumberController : "+controllerName+" in spring applicationContext");
+        }
         Map<String, Object> paramsForController = invocation.getParamsForController();
         ConcurrentHashMap<String, Object> modelForControllerView = invocation.getModelForControllerView();
         ConcurrentHashMap<String, Object> paramsForPagelets = invocation.getParamsForPagelets();
@@ -30,11 +37,10 @@ public class ControllerInterceptor implements Interceptor {
         if ( resultType!=ResultType.SUCCESS )
             return resultType;
 
-        String name = controller.getName();
-        PlumberControllerDefinition definition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(name);
+        PlumberControllerDefinition definition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(controllerName);
         String viewSource = definition.getViewSource();
         ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
-        String renderResult = viewRenderer.render(name, viewSource, modelForControllerView);
+        String renderResult = viewRenderer.render(controllerName, viewSource, modelForControllerView);
         invocation.setControllerRenderResult(renderResult);
         return ResultType.SUCCESS;
     }
