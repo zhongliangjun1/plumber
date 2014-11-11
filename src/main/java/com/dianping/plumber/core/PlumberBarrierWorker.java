@@ -19,7 +19,7 @@ public class PlumberBarrierWorker extends PlumberWorker {
     private final PlumberBarrier barrier;
     private final ConcurrentHashMap<String,String> barrierRenderResults;
 
-    public PlumberBarrierWorker(PlumberPageletDefinition definition, Map<String, Object> paramsFromController,
+    public PlumberBarrierWorker(PlumberBarrierDefinition definition, Map<String, Object> paramsFromController,
                                 CountDownLatch latch, PlumberBarrier barrier,
                                 ConcurrentHashMap<String, String> barrierRenderResults) {
         super(definition, paramsFromController);
