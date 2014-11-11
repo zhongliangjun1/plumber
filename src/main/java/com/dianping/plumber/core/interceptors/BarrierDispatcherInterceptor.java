@@ -1,6 +1,7 @@
 package com.dianping.plumber.core.interceptors;
 
 import com.dianping.plumber.core.*;
+import com.dianping.plumber.core.concurrent.Executor;
 import com.dianping.plumber.utils.CollectionUtils;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class BarrierDispatcherInterceptor implements Interceptor {
                 PlumberBarrier barrier = (PlumberBarrier) invocation.getApplicationContext().getBean(barrierName);
                 PlumberBarrierWorker barrierWorker = new PlumberBarrierWorker(barrierDefinition, paramsFromController,
                         barrierLatch, barrier, barrierRenderResults);
+                Executor.getInstance().submit(barrierWorker);
             }
             barrierLatch.await();
             ConcurrentHashMap<String, Object> modelForControllerView = invocation.getModelForControllerView();
