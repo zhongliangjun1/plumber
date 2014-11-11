@@ -16,7 +16,7 @@ import java.util.concurrent.CountDownLatch;
  * Time: PM10:42
  * To change this template use File | Settings | File Templates.
  */
-public class BarrierDispatcherInterceptor implements Interceptor {
+public class BarrierInterceptor implements Interceptor {
 
 
     @Override
