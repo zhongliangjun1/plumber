@@ -19,4 +19,12 @@ public abstract class PlumberGlobals {
 
     public static final String BARRIER_VIEW_PLACEHOLDER = "pb-barrier";
 
+    public static final int DEFAULT_CONCURRENT_COREPOOLSIZE = 50;
+
+    public static final int DEFAULT_CONCURRENT_MAXIMUMPOOLSIZE = 50;
+
+    public static final int DEFAULT_CONCURRENT_KEEPALIVETIME = 0;
+
+    public static final int DEFAULT_CONCURRENT_BLOCKINGQUEUECAPACITY = 1000;
+
 }

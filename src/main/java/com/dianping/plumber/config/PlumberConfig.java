@@ -39,6 +39,22 @@ public class PlumberConfig {
         return PlumberGlobals.BARRIER_VIEW_PLACEHOLDER;
     }
 
+    public static int getConcurrentCorePoolSize() {
+        return Configuration.get("concurrent.threadPool.corePoolSize", PlumberGlobals.DEFAULT_CONCURRENT_COREPOOLSIZE, Integer.class);
+    }
+
+    public static int getConcurrentMaximumPoolSize() {
+        return Configuration.get("concurrent.threadPool.maximumPoolSize", PlumberGlobals.DEFAULT_CONCURRENT_MAXIMUMPOOLSIZE, Integer.class);
+    }
+
+    public static int getConcurrentKeepAliveTime() {
+        return Configuration.get("concurrent.threadPool.keepAliveTime", PlumberGlobals.DEFAULT_CONCURRENT_KEEPALIVETIME, Integer.class);
+    }
+
+    public static int getConcurrentBlockingQueueCapacity() {
+        return Configuration.get("concurrent.threadPool.blockingQueueCapacity", PlumberGlobals.DEFAULT_CONCURRENT_BLOCKINGQUEUECAPACITY, Integer.class);
+    }
+
 
 
 }
