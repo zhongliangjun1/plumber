@@ -80,15 +80,55 @@
             <version>1.1.1</version>
         </dependency>
 
-        <!-- for demo begin-->
+        <!-- for support begin-->
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.14</version>
         </dependency>
-        <!-- for demo end-->
+        <!-- for support end-->
 
     </dependencies>
+
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1-alpha-1</version>
+                <configuration>
+                    <warName>${artifactId}-${version}</warName>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <workspace>${basedir}</workspace>
+                    <workspaceCodeStylesURL>
+                        http://svn.apache.org/repos/asf/maven/plugins/trunk/maven-eclipse-plugin/src/optional/eclipse-config/maven-styles.xml
+                    </workspaceCodeStylesURL>
+                    <downloadSources>true</downloadSources>
+                    <downloadJavadocs>false</downloadJavadocs>
+                    <wtpversion>1.5</wtpversion>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 
     
