@@ -5,6 +5,8 @@ import com.dianping.plumber.exception.PlumberControllerNotFoundException;
 import com.dianping.plumber.view.ViewRenderer;
 import org.springframework.context.ApplicationContext;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,7 +43,12 @@ public class ControllerInterceptor implements Interceptor {
         String viewSource = definition.getViewSource();
         ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
         String renderResult = viewRenderer.render(controllerName, viewSource, modelForControllerView);
-        invocation.setControllerRenderResult(renderResult);
+
+        HttpServletResponse response = invocation.getResponse();
+        PrintWriter writer = response.getWriter();
+        writer.print(renderResult);
+        response.flushBuffer();
+
         return ResultType.SUCCESS;
     }
 

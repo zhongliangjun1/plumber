@@ -25,25 +25,20 @@ public class InvocationContext {
 
     private final String controllerName;
     private final Map<String, Object> paramsForController;
-    private final ConcurrentHashMap<String, Object> modelForControllerView;
-    private final ConcurrentHashMap<String, Object> paramsForPagelets;
+    private final ConcurrentHashMap<String, Object> modelForControllerView = new ConcurrentHashMap<String, Object>();
+    private final ConcurrentHashMap<String, Object> paramsForPagelets = new ConcurrentHashMap<String, Object>();
     private final Iterator<Interceptor> interceptors;
     private final ApplicationContext applicationContext;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
 
     private ResultType resultType;
-    private String controllerRenderResult;
-
 
 
     public InvocationContext(String controllerName, ApplicationContext applicationContext, Map<String, Object> paramsForController,
-                             ConcurrentHashMap<String, Object> modelForControllerView, ConcurrentHashMap<String, Object> paramsForPagelets,
                              HttpServletRequest request, HttpServletResponse response) {
         this.controllerName = controllerName;
         this.paramsForController = paramsForController;
-        this.modelForControllerView = modelForControllerView;
-        this.paramsForPagelets = paramsForPagelets;
         this.applicationContext = applicationContext;
         this.request = request;
         this.response = response;
@@ -84,14 +79,6 @@ public class InvocationContext {
 
     public ConcurrentHashMap<String, Object> getParamsForPagelets() {
         return paramsForPagelets;
-    }
-
-    public String getControllerRenderResult() {
-        return controllerRenderResult;
-    }
-
-    public void setControllerRenderResult(String controllerRenderResult) {
-        this.controllerRenderResult = controllerRenderResult;
     }
 
     public HttpServletRequest getRequest() {

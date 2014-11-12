@@ -1,8 +1,7 @@
 package com.dianping.plumber.core;
 
-import com.dianping.plumber.exception.PlumberControllerNotFoundException;
 import com.dianping.plumber.exception.PlumberInitializeFailureException;
-import com.dianping.plumber.utils.CollectionUtils;
+import com.dianping.plumber.exception.PlumberRuntimeException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -12,11 +11,7 @@ import org.springframework.context.ApplicationContextAware;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,44 +24,17 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
 
     private ApplicationContext applicationContext;
 
+
     public ResultType execute(String plumberControllerName, Map<String, Object> paramsForController,
                         HttpServletRequest request,  HttpServletResponse response) {
-
-        // execute controller to fill modelForControllerView and prepare paramsForPagelets
-        PlumberController controller = getPlumberController(plumberControllerName);
-        Map<String, Object> paramsForPagelets = new ConcurrentHashMap<String, Object>();
-        Map<String, Object> modelForControllerView = new ConcurrentHashMap<String, Object>();
-        ResultType controllerResult = controller.execute(paramsForController, paramsForPagelets, modelForControllerView);
-        if ( controllerResult!=ResultType.SUCCESS )
-            return controllerResult;
-
-        PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(plumberControllerName);
-        if ( !CollectionUtils.isEmpty(controllerDefinition.getBarrierNames()) ) {
-            CountDownLatch barrierLatch = new CountDownLatch(controllerDefinition.getBarrierNames().size());
+        InvocationContext invocationContext = new InvocationContext(plumberControllerName, applicationContext,
+                paramsForController, request, response);
+        try {
+             return invocationContext.invoke();
+        } catch (Exception e) {
+            throw new PlumberRuntimeException(e);
         }
-
-
-
-        return ResultType.SUCCESS;
     }
-
-
-
-
-
-
-    private PlumberController getPlumberController(String controllerName) {
-        PlumberController controller = (PlumberController) applicationContext.getBean(controllerName);
-        if ( controller==null ) {
-            throw new PlumberControllerNotFoundException("can not find your plumberController : "+controllerName+" in spring applicationContext");
-        }
-        return controller;
-    }
-
-//    private List<PlumberBarrier> getPlumberBarriers(PlumberControllerDefinition controllerDefinition) {
-//        List<String> barrierNames = controllerDefinition.getBarrierNames();
-//        List<PlumberBarrierDefinition> barrierDefinitions = controllerDefinition.getBarrierDefinitions();
-//    }
 
 
 
@@ -74,9 +42,6 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-
-
-
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
