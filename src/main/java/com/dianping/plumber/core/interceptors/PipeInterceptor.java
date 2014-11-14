@@ -4,9 +4,9 @@ import com.dianping.plumber.core.*;
 import com.dianping.plumber.core.concurrent.Executor;
 import com.dianping.plumber.utils.CollectionUtils;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,11 +24,11 @@ public class PipeInterceptor implements Interceptor {
         List<PlumberPipeDefinition> pipeDefinitions = controllerDefinition.getPipeDefinitions();
         if ( !CollectionUtils.isEmpty(pipeDefinitions) ) {
             Map<String, Object> paramsFromController = invocation.getParamsForPagelets();
-            HttpServletResponse response = invocation.getResponse();
             for (PlumberPipeDefinition definition : pipeDefinitions) {
                 String name = definition.getName();
                 PlumberPipe pipe = (PlumberPipe) invocation.getApplicationContext().getBean(name);
-                PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromController, pipe, response);
+                LinkedBlockingQueue<String> pipeRenderResultQueue = invocation.getPipeRenderResultQueue();
+                PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromController, pipe, pipeRenderResultQueue);
                 Executor.getInstance().submit(pipeWorker);
             }
         }

@@ -1,10 +1,8 @@
 package com.dianping.plumber.core;
 
 import com.dianping.plumber.view.ViewRenderer;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,13 +14,12 @@ import java.util.Map;
 public class PlumberPipeWorker extends PlumberWorker {
 
     private final PlumberPipe pipe;
-    private final HttpServletResponse response;
+    private final LinkedBlockingQueue<String> pipeRenderResultQueue;
 
-    public PlumberPipeWorker(PlumberPipeDefinition definition, Map<String, Object> paramsFromController,
-                             PlumberPipe pipe, HttpServletResponse response) {
+    public PlumberPipeWorker(PlumberPipeDefinition definition, Map<String, Object> paramsFromController, PlumberPipe pipe, LinkedBlockingQueue<String> pipeRenderResultQueue) {
         super(definition, paramsFromController);
         this.pipe = pipe;
-        this.response = response;
+        this.pipeRenderResultQueue = pipeRenderResultQueue;
     }
 
     @Override
@@ -34,10 +31,7 @@ public class PlumberPipeWorker extends PlumberWorker {
                 String viewSource = definition.getViewSource();
                 ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
                 String renderResult = viewRenderer.render(name, viewSource, modelForView);
-
-                PrintWriter writer = response.getWriter();
-                writer.print(renderResult);
-                response.flushBuffer();
+                pipeRenderResultQueue.put(renderResult);
             }
         } catch (Exception e) {
             logger.error(e);

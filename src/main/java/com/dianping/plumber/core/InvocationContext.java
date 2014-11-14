@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,6 +32,7 @@ public class InvocationContext {
     private final ApplicationContext applicationContext;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
+    private final LinkedBlockingQueue<String> pipeRenderResultQueue = new LinkedBlockingQueue<String>();
 
     private ResultType resultType;
 
@@ -59,6 +61,10 @@ public class InvocationContext {
         interceptorList.add(new BarrierInterceptor());
         interceptorList.add(new PipeInterceptor());
         return interceptorList.iterator();
+    }
+
+    public LinkedBlockingQueue<String> getPipeRenderResultQueue() {
+        return pipeRenderResultQueue;
     }
 
     public String getControllerName() {

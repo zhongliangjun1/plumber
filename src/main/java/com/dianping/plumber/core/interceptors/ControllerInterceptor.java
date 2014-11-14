@@ -2,13 +2,16 @@ package com.dianping.plumber.core.interceptors;
 
 import com.dianping.plumber.core.*;
 import com.dianping.plumber.exception.PlumberControllerNotFoundException;
+import com.dianping.plumber.utils.CollectionUtils;
+import com.dianping.plumber.utils.ResponseUtils;
 import com.dianping.plumber.view.ViewRenderer;
 import org.springframework.context.ApplicationContext;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,16 +42,26 @@ public class ControllerInterceptor implements Interceptor {
         if ( resultType!=ResultType.SUCCESS )
             return resultType;
 
-        PlumberControllerDefinition definition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(controllerName);
-        String viewSource = definition.getViewSource();
+        PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(controllerName);
+        String viewSource = controllerDefinition.getViewSource();
         ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
         String renderResult = viewRenderer.render(controllerName, viewSource, modelForControllerView);
 
         HttpServletResponse response = invocation.getResponse();
-        PrintWriter writer = response.getWriter();
-        writer.print(renderResult);
-        response.flushBuffer();
+        ResponseUtils.flushBuffer(response, renderResult);
 
+        List<PlumberPipeDefinition> pipeDefinitions = controllerDefinition.getPipeDefinitions();
+        if ( !CollectionUtils.isEmpty(pipeDefinitions) ) {
+            int pipeNum = pipeDefinitions.size();
+            LinkedBlockingQueue<String> pipeRenderResultQueue = invocation.getPipeRenderResultQueue();
+            while ( pipeNum>0 ) {
+                String pipeRenderResult = pipeRenderResultQueue.take();
+                ResponseUtils.flushBuffer(response, pipeRenderResult);
+                pipeNum = pipeNum-1;
+            }
+        }
+
+        ResponseUtils.flushBuffer(response, PlumberGlobals.CHUNKED_END);
         return ResultType.SUCCESS;
     }
 

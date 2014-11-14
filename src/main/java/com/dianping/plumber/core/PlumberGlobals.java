@@ -27,4 +27,6 @@ public abstract class PlumberGlobals {
 
     public static final int DEFAULT_CONCURRENT_BLOCKINGQUEUECAPACITY = 1000;
 
+    public static final String CHUNKED_END = "</body></html>";
+
 }
