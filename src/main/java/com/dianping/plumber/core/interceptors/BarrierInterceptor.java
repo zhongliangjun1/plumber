@@ -35,11 +35,12 @@ public class BarrierInterceptor implements Interceptor {
                         barrierLatch, barrier, barrierRenderResults);
                 Executor.getInstance().submit(barrierWorker);
             }
+            invocation.invoke();
             barrierLatch.await();
             ConcurrentHashMap<String, Object> modelForControllerView = invocation.getModelForControllerView();
             modelForControllerView.putAll(barrierRenderResults);
         }
-        return invocation.invoke();
+        return ResultType.SUCCESS;
     }
 
 
