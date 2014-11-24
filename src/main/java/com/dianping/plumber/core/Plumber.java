@@ -64,24 +64,22 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
                 for (String beanDefinitionName : beanDefinitionNames) {
                     BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDefinitionName);
                     String beanClassName = beanDefinition.getBeanClassName();
-                    if ( beanDefinition.isSingleton() ) {
-                        try {
-                            Class c = Class.forName(beanClassName);
-                            if ( PlumberController.class.isAssignableFrom(c) ) {
-                                beanDefinition.setScope("prototype"); // reset PlumberController scope
-                                PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName);
-                            } else if ( PlumberPipe.class.isAssignableFrom(c) ) {
-                                beanDefinition.setScope("prototype"); // reset PlumberPipe scope
-                                PlumberWorkerDefinitionsRepo.pipeRegister(beanDefinitionName);
-                            } else if ( PlumberBarrier.class.isAssignableFrom(c) ) {
-                                beanDefinition.setScope("prototype"); // reset PlumberBarrier scope
-                                PlumberWorkerDefinitionsRepo.barrierRegister(beanDefinitionName);
-                            }
-                        } catch (ClassNotFoundException e) {
-                            throw new PlumberInitializeFailureException(e);
+                    try {
+                        Class c = Class.forName(beanClassName);
+                        if ( PlumberController.class.isAssignableFrom(c) ) {
+                            beanDefinition.setScope("prototype"); // reset PlumberController scope
+                            PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName);
+                        } else if ( PlumberPipe.class.isAssignableFrom(c) ) {
+                            beanDefinition.setScope("prototype"); // reset PlumberPipe scope
+                            PlumberWorkerDefinitionsRepo.pipeRegister(beanDefinitionName);
+                        } else if ( PlumberBarrier.class.isAssignableFrom(c) ) {
+                            beanDefinition.setScope("prototype"); // reset PlumberBarrier scope
+                            PlumberWorkerDefinitionsRepo.barrierRegister(beanDefinitionName);
+                        } else if ( Plumber.class.isAssignableFrom(c) ) {
+                            beanDefinition.setScope("singleton"); // reset Plumber scope
                         }
-                    } else if ( "com.dianping.plumber.core.Plumber".equals(beanClassName) ) {
-                        beanDefinition.setScope("singleton"); // reset Plumber scope
+                    } catch (ClassNotFoundException e) {
+                        throw new PlumberInitializeFailureException(e);
                     }
                 }
             }
