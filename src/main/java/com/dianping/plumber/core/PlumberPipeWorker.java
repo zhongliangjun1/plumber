@@ -32,6 +32,8 @@ public class PlumberPipeWorker extends PlumberWorker {
                 ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
                 String renderResult = viewRenderer.render(name, viewSource, modelForView);
                 pipeRenderResultQueue.put(renderResult);
+            } else {
+                pipeRenderResultQueue.put(PlumberGlobals.EMPTY_RENDER_RESULT);
             }
         } catch (Exception e) {
             logger.error(e);

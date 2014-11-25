@@ -56,7 +56,9 @@ public class ControllerInterceptor implements Interceptor {
             LinkedBlockingQueue<String> pipeRenderResultQueue = invocation.getPipeRenderResultQueue();
             while ( pipeNum>0 ) {
                 String pipeRenderResult = pipeRenderResultQueue.take();
-                ResponseUtils.flushBuffer(response, pipeRenderResult);
+                if ( !PlumberGlobals.EMPTY_RENDER_RESULT.equals(pipeRenderResult) ) {
+                    ResponseUtils.flushBuffer(response, pipeRenderResult);
+                }
                 pipeNum = pipeNum-1;
             }
         }
