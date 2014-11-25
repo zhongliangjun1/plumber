@@ -32,15 +32,17 @@ public class PlumberBarrierWorker extends PlumberWorker {
     public void run() {
         try {
             ResultType resultType = barrier.execute(paramsFromController, modelForView);
+            String name = definition.getName();
             if ( resultType==ResultType.SUCCESS ) {
-                String name = definition.getName();
                 String viewSource = definition.getViewSource();
                 ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
                 String renderResult = viewRenderer.render(name, viewSource, modelForView);
                 barrierRenderResults.put(name, renderResult);
+            } else {
+                barrierRenderResults.put(name, PlumberGlobals.EMPTY_RENDER_RESULT);
             }
         } catch (Exception e) {
-            barrierRenderResults.put(definition.getName(), "");
+            barrierRenderResults.put(definition.getName(), PlumberGlobals.EMPTY_RENDER_RESULT);
             logger.error(e);
         } finally {
             latch.countDown();
