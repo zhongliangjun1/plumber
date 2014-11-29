@@ -24,6 +24,11 @@ public class PlumberWorkerDefinitionsRepo {
     private final static List<String> controllerNames = new ArrayList<String>();
     private final static List<String> pipeNames = new ArrayList<String>();
     private final static List<String> barrierNames = new ArrayList<String>();
+
+    private final static Map<String, String> controllerViewNamesRepo = new HashMap<String, String>();
+    private final static Map<String, String> pipeViewNamesRepo = new HashMap<String, String>();
+    private final static Map<String, String> barrierViewNamesRepo = new HashMap<String, String>();
+
     private final static Map<String, PlumberControllerDefinition> controllerDefinitionsRepo = new HashMap<String, PlumberControllerDefinition>();
     private final static Map<String, PlumberPipeDefinition> pipeDefinitionsRepo = new HashMap<String, PlumberPipeDefinition>();
     private final static Map<String, PlumberBarrierDefinition> barrierDefinitionsRepo = new HashMap<String, PlumberBarrierDefinition>();
@@ -47,21 +52,37 @@ public class PlumberWorkerDefinitionsRepo {
         }
     }
 
-    public static void controllerRegister(String name) {
-        if ( !controllerNames.contains(name) ) {
-            controllerNames.add(name);
+    public static void controllerRegister(String controllerName, String viewName) {
+        if ( !controllerNames.contains(controllerName) ) {
+            controllerNames.add(controllerName);
+        }
+        if ( StringUtils.isNotEmpty(viewName) ) {
+            controllerViewNamesRepo.put(controllerName, viewName);
+        } else {
+            throw new PlumberInitializeFailureException("controller " + controllerName + " can not find valid viewName");
         }
     }
 
-    public static void pipeRegister(String name) {
-        if ( !pipeNames.contains(name) ) {
-            pipeNames.add(name);
+
+    public static void pipeRegister(String pipeName, String viewName) {
+        if ( !pipeNames.contains(pipeName) ) {
+            pipeNames.add(pipeName);
+        }
+        if ( StringUtils.isNotEmpty(viewName) ) {
+            pipeViewNamesRepo.put(pipeName, viewName);
+        } else {
+            throw new PlumberInitializeFailureException("pipe " + pipeName + " can not find valid viewName");
         }
     }
 
-    public static void barrierRegister(String name) {
-        if ( !barrierNames.contains(name) ) {
-            barrierNames.add(name);
+    public static void barrierRegister(String barrierName, String viewName) {
+        if ( !barrierNames.contains(barrierName) ) {
+            barrierNames.add(barrierName);
+        }
+        if ( StringUtils.isNotEmpty(viewName) ) {
+            barrierViewNamesRepo.put(barrierName, viewName);
+        } else {
+            throw new PlumberInitializeFailureException("barrier " + barrierName + " can not find valid viewName");
         }
     }
 
@@ -80,7 +101,8 @@ public class PlumberWorkerDefinitionsRepo {
                         PlumberBarrierDefinition barrierDefinition = new PlumberBarrierDefinition();
                         barrierDefinition.setName(barrierName);
 
-                        String viewName = barrierName;
+                        String viewName = barrierViewNamesRepo.get(barrierName);
+                        barrierDefinition.setViewName(viewName);
                         String viewSource = viewSourceLoader.load(viewName);
                         barrierDefinition.setViewSource(viewSource);
 
@@ -101,7 +123,8 @@ public class PlumberWorkerDefinitionsRepo {
                         PlumberPipeDefinition pipeDefinition = new PlumberPipeDefinition();
                         pipeDefinition.setName(pipeName);
 
-                        String viewName = pipeName;
+                        String viewName = pipeViewNamesRepo.get(pipeName);
+                        pipeDefinition.setViewName(viewName);
                         String viewSource = viewSourceLoader.load(viewName);
                         pipeDefinition.setViewSource(viewSource);
 
@@ -123,7 +146,8 @@ public class PlumberWorkerDefinitionsRepo {
                         PlumberControllerDefinition controllerDefinition = new PlumberControllerDefinition();
                         controllerDefinition.setName(controllerName);
 
-                        String viewName = controllerName;
+                        String viewName = controllerViewNamesRepo.get(controllerName);
+                        controllerDefinition.setViewName(viewName);
                         String viewSource = viewSourceLoader.load(viewName);
                         controllerDefinition.setViewSource(viewSource);
 

@@ -9,4 +9,13 @@ package com.dianping.plumber.core;
  */
 public abstract class PlumberPipe implements PlumberPagelet  {
 
+    protected String viewName;
+
+    public String getViewName() {
+        return viewName;
+    }
+
+    public void setViewName(String viewName) {
+        this.viewName = viewName;
+    }
 }

@@ -10,6 +10,7 @@ package com.dianping.plumber.core;
 public class PlumberPageletDefinition {
 
     protected String name;
+    protected String viewName;
     protected String viewSource;
 
     public String getName() {
@@ -26,5 +27,13 @@ public class PlumberPageletDefinition {
 
     public void setViewSource(String viewSource) {
         this.viewSource = viewSource;
+    }
+
+    public String getViewName() {
+        return viewName;
+    }
+
+    public void setViewName(String viewName) {
+        this.viewName = viewName;
     }
 }

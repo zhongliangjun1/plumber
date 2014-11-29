@@ -11,6 +11,8 @@ import java.util.Map;
  */
 public abstract class PlumberController {
 
+    protected String viewName;
+
     /**
      * entrance of request. Controller should prepare common params for its pipes ,
      * then execute its business logic to fill the modelForView.
@@ -23,4 +25,11 @@ public abstract class PlumberController {
      */
     public abstract ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsForPagelets, Map<String, Object> modelForView);
 
+    public String getViewName() {
+        return viewName;
+    }
+
+    public void setViewName(String viewName) {
+        this.viewName = viewName;
+    }
 }

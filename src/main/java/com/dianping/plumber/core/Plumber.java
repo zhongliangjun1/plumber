@@ -2,10 +2,14 @@ package com.dianping.plumber.core;
 
 import com.dianping.plumber.exception.PlumberInitializeFailureException;
 import com.dianping.plumber.exception.PlumberRuntimeException;
+import com.dianping.plumber.utils.StringUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -68,13 +72,16 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
                         Class c = Class.forName(beanClassName);
                         if ( PlumberController.class.isAssignableFrom(c) ) {
                             beanDefinition.setScope("prototype"); // reset PlumberController scope
-                            PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName);
+                            String controllerViewName = getViewName(beanDefinitionName, beanDefinition);
+                            PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName, controllerViewName);
                         } else if ( PlumberPipe.class.isAssignableFrom(c) ) {
                             beanDefinition.setScope("prototype"); // reset PlumberPipe scope
-                            PlumberWorkerDefinitionsRepo.pipeRegister(beanDefinitionName);
+                            String pipeViewName = getViewName(beanDefinitionName, beanDefinition);
+                            PlumberWorkerDefinitionsRepo.pipeRegister(beanDefinitionName, pipeViewName);
                         } else if ( PlumberBarrier.class.isAssignableFrom(c) ) {
                             beanDefinition.setScope("prototype"); // reset PlumberBarrier scope
-                            PlumberWorkerDefinitionsRepo.barrierRegister(beanDefinitionName);
+                            String barrierViewName = getViewName(beanDefinitionName, beanDefinition);
+                            PlumberWorkerDefinitionsRepo.barrierRegister(beanDefinitionName, barrierViewName);
                         } else if ( Plumber.class.isAssignableFrom(c) ) {
                             beanDefinition.setScope("singleton"); // reset Plumber scope
                         }
@@ -96,7 +103,19 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
         }
     }
 
-
+    private static String getViewName(String beanName, BeanDefinition beanDefinition) {
+        String viewName = beanName;
+        MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+        PropertyValue propertyValue = propertyValues.getPropertyValue("viewName");
+        if ( propertyValue!=null ) {
+            TypedStringValue typedStringValue = (TypedStringValue) propertyValue.getValue();
+            String value = typedStringValue.getValue();
+            if ( StringUtils.isNotEmpty(value) ) {
+                viewName = value;
+            }
+        }
+        return viewName;
+    }
 
 
 }
