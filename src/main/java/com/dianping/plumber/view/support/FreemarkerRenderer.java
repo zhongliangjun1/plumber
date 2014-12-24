@@ -3,7 +3,9 @@ package com.dianping.plumber.view.support;
 import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.utils.StringUtils;
 import com.dianping.plumber.view.ViewRenderer;
+import freemarker.cache.WebappTemplateLoader;
 import freemarker.template.Configuration;
+import freemarker.template.ObjectWrapper;
 import freemarker.template.Template;
 import org.apache.log4j.Logger;
 
@@ -40,6 +42,11 @@ public class FreemarkerRenderer implements ViewRenderer {
         Template template = templateCache.get(viewName);
         if (template == null) {
             Configuration config = new Configuration();
+            config.setTemplateUpdateDelay(600000);
+            config.setObjectWrapper(ObjectWrapper.BEANS_WRAPPER);
+            config.setNumberFormat("#");
+            config.setClassicCompatible(true);
+            config.setDefaultEncoding("UTF-8");
             BufferedReader reader = new BufferedReader(new StringReader(viewSource));
             try {
                 template = new Template(null, reader, config, PlumberConfig.getViewEncoding());
