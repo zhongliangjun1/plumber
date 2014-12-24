@@ -24,12 +24,14 @@ public class ControllerInterceptor implements Interceptor {
 
     @Override
     public ResultType intercept(InvocationContext invocation) throws Exception {
+
         String controllerName = invocation.getControllerName();
         ApplicationContext applicationContext = invocation.getApplicationContext();
         PlumberController controller = (PlumberController) applicationContext.getBean(controllerName);
         if ( controller==null ) {
             throw new PlumberControllerNotFoundException("can not find your plumberController : "+controllerName+" in spring applicationContext");
         }
+
         Map<String, Object> paramsForController = invocation.getParamsForController();
         ConcurrentHashMap<String, Object> modelForControllerView = invocation.getModelForControllerView();
         ConcurrentHashMap<String, Object> paramsForPagelets = invocation.getParamsForPagelets();

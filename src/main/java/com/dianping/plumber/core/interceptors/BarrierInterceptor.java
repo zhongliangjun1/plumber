@@ -21,13 +21,17 @@ public class BarrierInterceptor implements Interceptor {
 
     @Override
     public ResultType intercept(InvocationContext invocation) throws Exception {
+
         String controllerName = invocation.getControllerName();
         PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(controllerName);
+
         if ( !CollectionUtils.isEmpty(controllerDefinition.getBarrierNames()) ) {
+
             List<PlumberBarrierDefinition> barrierDefinitions = controllerDefinition.getBarrierDefinitions();
             CountDownLatch barrierLatch = new CountDownLatch(barrierDefinitions.size());
             Map<String, Object> paramsFromController = invocation.getParamsForPagelets();
             ConcurrentHashMap<String,String> barrierRenderResults = new ConcurrentHashMap<String, String>();
+
             for ( PlumberBarrierDefinition barrierDefinition : barrierDefinitions ) {
                 String barrierName = barrierDefinition.getName();
                 PlumberBarrier barrier = (PlumberBarrier) invocation.getApplicationContext().getBean(barrierName);
@@ -35,7 +39,9 @@ public class BarrierInterceptor implements Interceptor {
                         barrierLatch, barrier, barrierRenderResults);
                 Executor.getInstance().submit(barrierWorker);
             }
+
             invocation.invoke();
+
             barrierLatch.await();
             ConcurrentHashMap<String, Object> modelForControllerView = invocation.getModelForControllerView();
             modelForControllerView.putAll(barrierRenderResults);

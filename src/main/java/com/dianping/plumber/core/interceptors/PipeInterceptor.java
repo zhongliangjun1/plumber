@@ -19,10 +19,13 @@ public class PipeInterceptor implements Interceptor {
 
     @Override
     public ResultType intercept(InvocationContext invocation) throws Exception {
+
         String controllerName = invocation.getControllerName();
         PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(controllerName);
         List<PlumberPipeDefinition> pipeDefinitions = controllerDefinition.getPipeDefinitions();
+
         if ( !CollectionUtils.isEmpty(pipeDefinitions) ) {
+
             Map<String, Object> paramsFromController = invocation.getParamsForPagelets();
             for (PlumberPipeDefinition definition : pipeDefinitions) {
                 String name = definition.getName();
@@ -31,6 +34,7 @@ public class PipeInterceptor implements Interceptor {
                 PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromController, pipe, pipeRenderResultQueue);
                 Executor.getInstance().submit(pipeWorker);
             }
+
         }
         return ResultType.SUCCESS;
     }
