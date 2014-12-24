@@ -43,6 +43,7 @@ public class Executor {
             executorService = new ThreadPoolExecutor(corePoolSize,
                     maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<Runnable>(blockingQueueCapacity),
+                    new PlumberThreadFactory(),
                     new ThreadPoolExecutor.CallerRunsPolicy());
 
             logger.info("executorService has been initialized");
