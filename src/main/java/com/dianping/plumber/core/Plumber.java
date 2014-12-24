@@ -68,6 +68,8 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
                 for (String beanDefinitionName : beanDefinitionNames) {
                     BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDefinitionName);
                     String beanClassName = beanDefinition.getBeanClassName();
+                    if ( StringUtils.isEmpty(beanClassName) )
+                        continue;
                     try {
                         Class c = Class.forName(beanClassName);
                         if ( PlumberController.class.isAssignableFrom(c) ) {
