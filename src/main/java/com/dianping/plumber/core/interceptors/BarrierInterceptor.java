@@ -42,7 +42,7 @@ public class BarrierInterceptor implements Interceptor {
                 String barrierName = barrierDefinition.getName();
                 PlumberBarrier barrier = (PlumberBarrier) invocation.getApplicationContext().getBean(barrierName);
                 injectAnnotationFields(barrier, barrierDefinition, paramsFromRequest, paramsFromController);
-                PlumberBarrierWorker barrierWorker = new PlumberBarrierWorker(barrierDefinition, paramsFromController,
+                PlumberBarrierWorker barrierWorker = new PlumberBarrierWorker(barrierDefinition, paramsFromRequest, paramsFromController,
                         barrierLatch, barrier, barrierRenderResults);
                 Executor.getInstance().submit(barrierWorker);
             }

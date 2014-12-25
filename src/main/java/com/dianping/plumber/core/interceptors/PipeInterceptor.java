@@ -38,7 +38,7 @@ public class PipeInterceptor implements Interceptor {
                 PlumberPipe pipe = (PlumberPipe) invocation.getApplicationContext().getBean(name);
                 injectAnnotationFields(pipe, definition, paramsFromRequest, paramsFromController);
                 LinkedBlockingQueue<String> pipeRenderResultQueue = invocation.getPipeRenderResultQueue();
-                PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromController, pipe, pipeRenderResultQueue);
+                PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromRequest, paramsFromController, pipe, pipeRenderResultQueue);
                 Executor.getInstance().submit(pipeWorker);
             }
 
