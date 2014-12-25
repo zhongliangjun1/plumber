@@ -66,30 +66,41 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
             String[] beanDefinitionNames = beanFactory.getBeanDefinitionNames();
             if (beanDefinitionNames!=null && beanDefinitionNames.length>0) {
                 for (String beanDefinitionName : beanDefinitionNames) {
+
                     BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDefinitionName);
                     String beanClassName = beanDefinition.getBeanClassName();
                     if ( StringUtils.isEmpty(beanClassName) )
                         continue;
+
                     try {
-                        Class c = Class.forName(beanClassName);
-                        if ( PlumberController.class.isAssignableFrom(c) ) {
+                        Class clazz = Class.forName(beanClassName);
+                        if ( PlumberController.class.isAssignableFrom(clazz) ) {
+
                             beanDefinition.setScope("prototype"); // reset PlumberController scope
                             String controllerViewName = getViewName(beanDefinitionName, beanDefinition);
-                            PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName, controllerViewName);
-                        } else if ( PlumberPipe.class.isAssignableFrom(c) ) {
+                            PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName, controllerViewName, clazz);
+
+                        } else if ( PlumberPipe.class.isAssignableFrom(clazz) ) {
+
                             beanDefinition.setScope("prototype"); // reset PlumberPipe scope
                             String pipeViewName = getViewName(beanDefinitionName, beanDefinition);
-                            PlumberWorkerDefinitionsRepo.pipeRegister(beanDefinitionName, pipeViewName);
-                        } else if ( PlumberBarrier.class.isAssignableFrom(c) ) {
+                            PlumberWorkerDefinitionsRepo.pipeRegister(beanDefinitionName, pipeViewName, clazz);
+
+                        } else if ( PlumberBarrier.class.isAssignableFrom(clazz) ) {
+
                             beanDefinition.setScope("prototype"); // reset PlumberBarrier scope
                             String barrierViewName = getViewName(beanDefinitionName, beanDefinition);
-                            PlumberWorkerDefinitionsRepo.barrierRegister(beanDefinitionName, barrierViewName);
-                        } else if ( Plumber.class.isAssignableFrom(c) ) {
+                            PlumberWorkerDefinitionsRepo.barrierRegister(beanDefinitionName, barrierViewName, clazz);
+
+                        } else if ( Plumber.class.isAssignableFrom(clazz) ) {
+
                             beanDefinition.setScope("singleton"); // reset Plumber scope
+
                         }
                     } catch (ClassNotFoundException e) {
                         throw new PlumberInitializeFailureException(e);
                     }
+
                 }
             }
         }
