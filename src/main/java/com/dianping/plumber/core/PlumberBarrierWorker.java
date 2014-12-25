@@ -19,10 +19,13 @@ public class PlumberBarrierWorker extends PlumberWorker {
     private final PlumberBarrier barrier;
     private final ConcurrentHashMap<String,String> barrierRenderResults;
 
-    public PlumberBarrierWorker(PlumberBarrierDefinition definition, Map<String, Object> paramsFromController,
-                                CountDownLatch latch, PlumberBarrier barrier,
+    public PlumberBarrierWorker(PlumberBarrierDefinition definition,
+                                Map<String, Object> paramsFromRequest,
+                                Map<String, Object> paramsFromController,
+                                CountDownLatch latch,
+                                PlumberBarrier barrier,
                                 ConcurrentHashMap<String, String> barrierRenderResults) {
-        super(definition, paramsFromController);
+        super(definition, paramsFromRequest, paramsFromController);
         this.latch = latch;
         this.barrier = barrier;
         this.barrierRenderResults = barrierRenderResults;
@@ -32,7 +35,7 @@ public class PlumberBarrierWorker extends PlumberWorker {
     public void run() {
         String name = definition.getName();
         try {
-            ResultType resultType = barrier.execute(paramsFromController, modelForView);
+            ResultType resultType = barrier.execute(paramsFromRequest, paramsFromController, modelForView);
             if ( resultType==ResultType.SUCCESS ) {
                 String viewSource = definition.getViewSource();
                 ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();

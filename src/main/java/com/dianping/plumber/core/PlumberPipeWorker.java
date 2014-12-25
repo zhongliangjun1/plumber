@@ -16,8 +16,12 @@ public class PlumberPipeWorker extends PlumberWorker {
     private final PlumberPipe pipe;
     private final LinkedBlockingQueue<String> pipeRenderResultQueue;
 
-    public PlumberPipeWorker(PlumberPipeDefinition definition, Map<String, Object> paramsFromController, PlumberPipe pipe, LinkedBlockingQueue<String> pipeRenderResultQueue) {
-        super(definition, paramsFromController);
+    public PlumberPipeWorker(PlumberPipeDefinition definition,
+                             Map<String, Object> paramsFromRequest,
+                             Map<String, Object> paramsFromController,
+                             PlumberPipe pipe,
+                             LinkedBlockingQueue<String> pipeRenderResultQueue) {
+        super(definition, paramsFromRequest, paramsFromController);
         this.pipe = pipe;
         this.pipeRenderResultQueue = pipeRenderResultQueue;
     }
@@ -25,7 +29,7 @@ public class PlumberPipeWorker extends PlumberWorker {
     @Override
     public void run() {
         try {
-            ResultType resultType = pipe.execute(paramsFromController, modelForView);
+            ResultType resultType = pipe.execute(paramsFromRequest, paramsFromController, modelForView);
             if ( resultType==ResultType.SUCCESS ) {
                 String name = definition.getName();
                 String viewSource = definition.getViewSource();

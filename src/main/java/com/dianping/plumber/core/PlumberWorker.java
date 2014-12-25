@@ -17,11 +17,15 @@ public abstract class PlumberWorker implements Runnable {
     protected Logger logger = Logger.getLogger(PlumberWorker.class);
 
     protected final PlumberPageletDefinition definition;
+    protected final Map<String, Object> paramsFromRequest;
     protected final Map<String, Object> paramsFromController;
     protected Map<String, Object> modelForView = new HashMap<String, Object>();
 
-    public PlumberWorker(PlumberPageletDefinition definition, Map<String, Object> paramsFromController) {
+    public PlumberWorker(PlumberPageletDefinition definition,
+                         Map<String, Object> paramsFromRequest,
+                         Map<String, Object> paramsFromController) {
         this.definition = definition;
+        this.paramsFromRequest = paramsFromRequest;
         this.paramsFromController = paramsFromController;
     }
 
