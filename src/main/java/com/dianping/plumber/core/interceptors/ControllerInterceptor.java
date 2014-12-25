@@ -55,6 +55,7 @@ public class ControllerInterceptor implements Interceptor {
 
         List<PlumberPipeDefinition> pipeDefinitions = controllerDefinition.getPipeDefinitions();
         if ( !CollectionUtils.isEmpty(pipeDefinitions) ) {
+
             int pipeNum = pipeDefinitions.size();
             LinkedBlockingQueue<String> pipeRenderResultQueue = invocation.getPipeRenderResultQueue();
             while ( pipeNum>0 ) {
@@ -64,9 +65,11 @@ public class ControllerInterceptor implements Interceptor {
                 }
                 pipeNum = pipeNum-1;
             }
+
+            // only with pipes need to ensure html to be unclosed, and the close tag will be flushed by framework finally
+            ResponseUtils.flushBuffer(response, PlumberGlobals.CHUNKED_END);
         }
 
-        ResponseUtils.flushBuffer(response, PlumberGlobals.CHUNKED_END);
         return ResultType.SUCCESS;
     }
 
