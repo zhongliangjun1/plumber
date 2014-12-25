@@ -23,7 +23,8 @@ public abstract class ResponseUtils {
             writer.print(renderResult);
             response.flushBuffer();
         } catch (IOException e) {
-            logger.error(e);
+            String msg = "response flush buffer with some IO problem";
+            logger.error(msg,e);
         }
     }
 

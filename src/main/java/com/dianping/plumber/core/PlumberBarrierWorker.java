@@ -19,10 +19,13 @@ public class PlumberBarrierWorker extends PlumberWorker {
     private final PlumberBarrier barrier;
     private final ConcurrentHashMap<String,String> barrierRenderResults;
 
-    public PlumberBarrierWorker(PlumberBarrierDefinition definition, Map<String, Object> paramsFromController,
-                                CountDownLatch latch, PlumberBarrier barrier,
+    public PlumberBarrierWorker(PlumberBarrierDefinition definition,
+                                Map<String, Object> paramsFromRequest,
+                                Map<String, Object> paramsFromController,
+                                CountDownLatch latch,
+                                PlumberBarrier barrier,
                                 ConcurrentHashMap<String, String> barrierRenderResults) {
-        super(definition, paramsFromController);
+        super(definition, paramsFromRequest, paramsFromController);
         this.latch = latch;
         this.barrier = barrier;
         this.barrierRenderResults = barrierRenderResults;
@@ -30,9 +33,9 @@ public class PlumberBarrierWorker extends PlumberWorker {
 
     @Override
     public void run() {
+        String name = definition.getName();
         try {
-            ResultType resultType = barrier.execute(paramsFromController, modelForView);
-            String name = definition.getName();
+            ResultType resultType = barrier.execute(paramsFromRequest, paramsFromController, modelForView);
             if ( resultType==ResultType.SUCCESS ) {
                 String viewSource = definition.getViewSource();
                 ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
@@ -42,8 +45,9 @@ public class PlumberBarrierWorker extends PlumberWorker {
                 barrierRenderResults.put(name, PlumberGlobals.EMPTY_RENDER_RESULT);
             }
         } catch (Exception e) {
-            barrierRenderResults.put(definition.getName(), PlumberGlobals.EMPTY_RENDER_RESULT);
-            logger.error(e);
+            barrierRenderResults.put(name, PlumberGlobals.EMPTY_RENDER_RESULT);
+            String msg = "barrier " + name + " execute failure";
+            logger.error(msg, e);
         } finally {
             latch.countDown();
         }

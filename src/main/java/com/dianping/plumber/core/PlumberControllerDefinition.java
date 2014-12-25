@@ -1,5 +1,6 @@
 package com.dianping.plumber.core;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -21,6 +22,8 @@ public class PlumberControllerDefinition {
     private List<String> pipeNames;
     private List<PlumberPipeDefinition> pipeDefinitions;
 
+    private Class<PlumberController> controllerClass;
+    private List<Field> paramFromRequestFields;
 
 
 
@@ -78,5 +81,21 @@ public class PlumberControllerDefinition {
 
     public void setPipeDefinitions(List<PlumberPipeDefinition> pipeDefinitions) {
         this.pipeDefinitions = pipeDefinitions;
+    }
+
+    public List<Field> getParamFromRequestFields() {
+        return paramFromRequestFields;
+    }
+
+    public void setParamFromRequestFields(List<Field> paramFromRequestFields) {
+        this.paramFromRequestFields = paramFromRequestFields;
+    }
+
+    public Class<PlumberController> getControllerClass() {
+        return controllerClass;
+    }
+
+    public void setControllerClass(Class<PlumberController> controllerClass) {
+        this.controllerClass = controllerClass;
     }
 }
