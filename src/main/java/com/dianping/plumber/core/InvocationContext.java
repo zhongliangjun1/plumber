@@ -79,6 +79,10 @@ public class InvocationContext {
         return paramsForController;
     }
 
+    public Map<String, Object> getParamsFromRequest() {
+        return paramsForController;
+    }
+
     public ConcurrentHashMap<String, Object> getModelForControllerView() {
         return modelForControllerView;
     }
