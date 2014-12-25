@@ -14,10 +14,10 @@ public abstract class PlumberController {
     protected String viewName;
 
     /**
-     * entrance of request. Controller should prepare common params for its pipes ,
+     * entrance of request. Controller should prepare common params for its pagelets ,
      * then execute its business logic to fill the modelForView.
      * View of this Controller will be the first time response send to client,
-     * you can also set pipe to be required ,then it will be sent with this view.
+     * you can also set pagelets to be barrier ,then it will be sent with this view.
      * @param paramsFromRequest
      * @param paramsForPagelets
      * @param modelForView
