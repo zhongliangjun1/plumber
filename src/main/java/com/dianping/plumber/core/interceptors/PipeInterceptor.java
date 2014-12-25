@@ -2,8 +2,10 @@ package com.dianping.plumber.core.interceptors;
 
 import com.dianping.plumber.core.*;
 import com.dianping.plumber.core.concurrent.Executor;
+import com.dianping.plumber.exception.PlumberRuntimeException;
 import com.dianping.plumber.utils.CollectionUtils;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -26,10 +28,12 @@ public class PipeInterceptor implements Interceptor {
 
         if ( !CollectionUtils.isEmpty(pipeDefinitions) ) {
 
+            Map<String, Object> paramsFromRequest = invocation.getParamsFromRequest();
             Map<String, Object> paramsFromController = invocation.getParamsForPagelets();
             for (PlumberPipeDefinition definition : pipeDefinitions) {
                 String name = definition.getName();
                 PlumberPipe pipe = (PlumberPipe) invocation.getApplicationContext().getBean(name);
+                injectAnnotationFields(pipe, definition, paramsFromRequest, paramsFromController);
                 LinkedBlockingQueue<String> pipeRenderResultQueue = invocation.getPipeRenderResultQueue();
                 PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromController, pipe, pipeRenderResultQueue);
                 Executor.getInstance().submit(pipeWorker);
@@ -37,6 +41,41 @@ public class PipeInterceptor implements Interceptor {
 
         }
         return ResultType.SUCCESS;
+    }
+
+    private void injectAnnotationFields(PlumberPipe pipe,
+                                        PlumberPipeDefinition pipeDefinition,
+                                        Map<String, Object> paramsFromRequest,
+                                        Map<String, Object> paramsFromController) {
+
+        String pipeName = pipeDefinition.getName();
+        List<Field> paramFromRequestFields = pipeDefinition.getParamFromRequestFields();
+        List<Field> paramFromControllerFields = pipeDefinition.getParamFromControllerFields();
+
+        injectAnnotationFields(pipeName, pipe, paramFromRequestFields, paramsFromRequest);
+        injectAnnotationFields(pipeName, pipe, paramFromControllerFields, paramsFromController);
+
+    }
+
+    private void injectAnnotationFields(String pipeName,
+                                        PlumberPipe pipe,
+                                        List<Field> fields,
+                                        Map<String, Object> params) {
+
+        if ( !CollectionUtils.isEmpty(fields) && params!=null ) {
+            for ( Field field : fields ) {
+                String fieldName = field.getName();
+                Object fieldValue = params.get(fieldName);
+                if( fieldValue!=null ){
+                    try {
+                        field.set(pipe, fieldValue);
+                    } catch (IllegalAccessException e) {
+                        throw new PlumberRuntimeException("inject annotation field of " + fieldName + " for pipe "+ pipeName + "failure", e);
+                    }
+                }
+            }
+        }
+
     }
 
 
