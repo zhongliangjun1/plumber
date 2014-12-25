@@ -52,7 +52,7 @@ public class FreemarkerRenderer implements ViewRenderer {
                 template = new Template(null, reader, config, PlumberConfig.getViewEncoding());
                 templateCache.put(viewName, template);
             } catch(Exception e){
-                logger.error(e);
+                logger.error("template init failure", e);
             }
         }
         return template;
@@ -67,7 +67,7 @@ public class FreemarkerRenderer implements ViewRenderer {
             writer.flush();
             result = stringWriter.toString();
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("render failure", e);
         }
         return result;
     }

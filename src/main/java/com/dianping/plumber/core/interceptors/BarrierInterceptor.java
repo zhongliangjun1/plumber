@@ -4,6 +4,7 @@ import com.dianping.plumber.core.*;
 import com.dianping.plumber.core.concurrent.Executor;
 import com.dianping.plumber.exception.PlumberRuntimeException;
 import com.dianping.plumber.utils.CollectionUtils;
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -19,6 +20,8 @@ import java.util.concurrent.CountDownLatch;
  * To change this template use File | Settings | File Templates.
  */
 public class BarrierInterceptor implements Interceptor {
+
+    private Logger logger = Logger.getLogger(BarrierInterceptor.class);
 
 
     @Override
@@ -79,8 +82,9 @@ public class BarrierInterceptor implements Interceptor {
                 if( fieldValue!=null ){
                     try {
                         field.set(barrier, fieldValue);
-                    } catch (IllegalAccessException e) {
-                        throw new PlumberRuntimeException("inject annotation field of " + fieldName + " for barrier "+ barrierName + "failure", e);
+                    } catch (Exception e) {
+                        String msg = "inject annotation field of " + fieldName + " for barrier "+ barrierName + " failure";
+                        logger.error(msg, new PlumberRuntimeException(msg, e));
                     }
                 }
             }

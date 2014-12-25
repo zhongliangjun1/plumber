@@ -6,6 +6,7 @@ import com.dianping.plumber.exception.PlumberRuntimeException;
 import com.dianping.plumber.utils.CollectionUtils;
 import com.dianping.plumber.utils.ResponseUtils;
 import com.dianping.plumber.view.ViewRenderer;
+import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +24,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * To change this template use File | Settings | File Templates.
  */
 public class ControllerInterceptor implements Interceptor {
+
+    private Logger logger = Logger.getLogger(ControllerInterceptor.class);
 
     @Override
     public ResultType intercept(InvocationContext invocation) throws Exception {
@@ -96,8 +99,9 @@ public class ControllerInterceptor implements Interceptor {
                 if( fieldValue!=null ){
                     try {
                         field.set(controller, fieldValue);
-                    } catch (IllegalAccessException e) {
-                        throw new PlumberRuntimeException("inject annotation field of " + fieldName + " for controller "+ controllerName + "failure", e);
+                    } catch (Exception e) {
+                        String msg = "inject annotation field of " + fieldName + " for controller "+ controllerName + " failure";
+                        logger.error(msg, new PlumberRuntimeException(msg, e));
                     }
                 }
             }

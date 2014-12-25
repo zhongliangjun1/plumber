@@ -36,7 +36,8 @@ public class PlumberPipeWorker extends PlumberWorker {
                 pipeRenderResultQueue.put(PlumberGlobals.EMPTY_RENDER_RESULT);
             }
         } catch (Exception e) {
-            logger.error(e);
+            String msg = "pipe " + definition.getName() + " execute failure";
+            logger.error(msg, e);
         }
     }
 }
