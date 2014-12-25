@@ -40,7 +40,11 @@ public class PlumberBarrierWorker extends PlumberWorker {
                 String viewSource = definition.getViewSource();
                 ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
                 String renderResult = viewRenderer.render(name, viewSource, modelForView);
-                barrierRenderResults.put(name, renderResult);
+                if ( renderResult!=null ) { // protect ConcurrentHashMap
+                    barrierRenderResults.put(name, renderResult);
+                } else {
+                    barrierRenderResults.put(name, PlumberGlobals.EMPTY_RENDER_RESULT);
+                }
             } else {
                 barrierRenderResults.put(name, PlumberGlobals.EMPTY_RENDER_RESULT);
             }
