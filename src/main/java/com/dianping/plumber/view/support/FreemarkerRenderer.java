@@ -49,10 +49,10 @@ public class FreemarkerRenderer implements ViewRenderer {
             config.setDefaultEncoding("UTF-8");
             BufferedReader reader = new BufferedReader(new StringReader(viewSource));
             try {
-                template = new Template(null, reader, config, PlumberConfig.getViewEncoding());
+                template = new Template(viewName, reader, config, PlumberConfig.getViewEncoding());
                 templateCache.put(viewName, template);
             } catch(Exception e){
-                logger.error("template init failure", e);
+                logger.error(viewName+" template init failure", e);
             }
         }
         return template;
@@ -67,7 +67,7 @@ public class FreemarkerRenderer implements ViewRenderer {
             writer.flush();
             result = stringWriter.toString();
         } catch (Exception e) {
-            logger.error("render failure", e);
+            logger.error(template.getName() + " render failure", e);
         }
         return result;
     }
