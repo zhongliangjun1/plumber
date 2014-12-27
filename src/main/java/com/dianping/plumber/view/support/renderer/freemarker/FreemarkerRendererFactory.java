@@ -1,4 +1,4 @@
-package com.dianping.plumber.view.support;
+package com.dianping.plumber.view.support.renderer.freemarker;
 
 import com.dianping.plumber.view.ViewRenderer;
 import com.dianping.plumber.view.ViewRendererFactory;

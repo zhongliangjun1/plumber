@@ -1,4 +1,4 @@
-package com.dianping.plumber.view.support;
+package com.dianping.plumber.view.support.loader;
 
 import com.dianping.plumber.view.ViewSourceLoader;
 import com.dianping.plumber.view.ViewSourceLoaderFactory;

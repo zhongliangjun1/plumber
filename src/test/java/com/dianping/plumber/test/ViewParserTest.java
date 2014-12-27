@@ -2,7 +2,7 @@ package com.dianping.plumber.test;
 
 import com.dianping.plumber.view.ViewParser;
 import com.dianping.plumber.view.ViewSourceLoader;
-import com.dianping.plumber.view.support.ViewSourceUnderClassPathLoader;
+import com.dianping.plumber.view.support.loader.ViewSourceUnderClassPathLoader;
 
 import java.util.List;
 

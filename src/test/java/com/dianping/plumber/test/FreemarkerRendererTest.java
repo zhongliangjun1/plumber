@@ -2,8 +2,8 @@ package com.dianping.plumber.test;
 
 import com.dianping.plumber.utils.EnvPrepareUtils;
 import com.dianping.plumber.view.ViewSourceLoader;
-import com.dianping.plumber.view.support.FreemarkerRenderer;
-import com.dianping.plumber.view.support.ViewSourceUnderClassPathLoader;
+import com.dianping.plumber.view.support.renderer.freemarker.FreemarkerRenderer;
+import com.dianping.plumber.view.support.loader.ViewSourceUnderClassPathLoader;
 
 import java.util.HashMap;
 import java.util.Map;

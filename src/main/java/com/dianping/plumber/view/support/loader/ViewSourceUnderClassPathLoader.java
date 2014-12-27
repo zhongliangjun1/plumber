@@ -1,4 +1,4 @@
-package com.dianping.plumber.view.support;
+package com.dianping.plumber.view.support.loader;
 
 import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.core.PlumberGlobals;

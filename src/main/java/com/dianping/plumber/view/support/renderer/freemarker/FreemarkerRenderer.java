@@ -1,4 +1,4 @@
-package com.dianping.plumber.view.support;
+package com.dianping.plumber.view.support.renderer.freemarker;
 
 import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.utils.StringUtils;
