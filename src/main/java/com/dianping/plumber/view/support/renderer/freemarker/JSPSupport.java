@@ -23,10 +23,10 @@ public class JSPSupport {
         if( taglibs==null ){
             taglibs= new TaglibFactory(servletContext);
         }
-        context.put("JspTaglibs",taglibs);
+        context.put("JspTaglibs", taglibs);
 
         ServletContextHashModel servletContextHashModel = (ServletContextHashModel)servletContext.getAttribute(".freemarker.Application");
-        context.put("Application",servletContextHashModel);
+        context.put("Application", servletContextHashModel);
 
         DefaultObjectWrapper wrapper = new DefaultObjectWrapper();
         context.put("Request", new HttpRequestHashModel(request, wrapper));
