@@ -12,11 +12,11 @@ import java.io.IOException;
 /**
  * Created with IntelliJ IDEA.
  * Author: liangjun.zhong
- * Date: 14-10-31
- * Time: PM10:41
+ * Date: 14-12-28
+ * Time: AM2:07
  * To change this template use File | Settings | File Templates.
  */
-public class ViewSourceUnderClassPathLoader implements ViewSourceLoader {
+public class ViewSourceUnderWebContextLoader implements ViewSourceLoader {
 
     @Override
     public String load(String viewPath) {
@@ -31,13 +31,13 @@ public class ViewSourceUnderClassPathLoader implements ViewSourceLoader {
 
         String viewSource;
         try {
-            viewSource = ResourceUtils.getResourceFromClassPath(viewPath, encoding);
+            viewSource = ResourceUtils.getResourceFromWebContext(viewPath, encoding);
         } catch (IOException e) {
-            throw new ViewSourceNotFoundException("can not find viewSource under your classpath : "+viewPath, e);
+            throw new ViewSourceNotFoundException("can not find viewSource under your webContext : "+viewPath, e);
         }
 
         return viewSource;
-    }
 
+    }
 
 }
