@@ -9,14 +9,13 @@ package com.dianping.plumber.core;
  */
 public abstract class PlumberBarrier implements PlumberPagelet {
 
-    protected String viewName;
+    protected String viewPath;
 
-    public String getViewName() {
-        return viewName;
+    public String getViewPath() {
+        return viewPath;
     }
 
-    public void setViewName(String viewName) {
-        this.viewName = viewName;
+    public void setViewPath(String viewPath) {
+        this.viewPath = viewPath;
     }
-
 }

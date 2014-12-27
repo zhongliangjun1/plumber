@@ -15,14 +15,6 @@ public class PlumberConfig {
         return Configuration.get("view.encoding", PlumberGlobals.DEFAULT_VIEW_ENCODING, String.class);
     }
 
-    public static String getViewResourcesPath() {
-        return Configuration.get("view.resourcesPath", String.class);
-    }
-
-    public static String getViewSuffix() {
-        return Configuration.get("view.suffix", String.class);
-    }
-
     public static String getViewSourceLoaderFactory() {
         return Configuration.get("view.viewSourceLoaderFactory", String.class);
     }

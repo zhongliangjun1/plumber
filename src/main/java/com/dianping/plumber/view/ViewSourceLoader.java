@@ -9,6 +9,6 @@ package com.dianping.plumber.view;
  */
 public interface ViewSourceLoader {
 
-    public String load(String viewName);
+    public String load(String viewPath);
 
 }

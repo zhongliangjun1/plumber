@@ -77,20 +77,20 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
                         if ( PlumberController.class.isAssignableFrom(clazz) ) {
 
                             beanDefinition.setScope("prototype"); // reset PlumberController scope
-                            String controllerViewName = getViewName(beanDefinitionName, beanDefinition);
-                            PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName, controllerViewName, clazz);
+                            String controllerViewPath = getViewPath(beanDefinitionName, beanDefinition);
+                            PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName, controllerViewPath, clazz);
 
                         } else if ( PlumberPipe.class.isAssignableFrom(clazz) ) {
 
                             beanDefinition.setScope("prototype"); // reset PlumberPipe scope
-                            String pipeViewName = getViewName(beanDefinitionName, beanDefinition);
-                            PlumberWorkerDefinitionsRepo.pipeRegister(beanDefinitionName, pipeViewName, clazz);
+                            String pipeViewPath = getViewPath(beanDefinitionName, beanDefinition);
+                            PlumberWorkerDefinitionsRepo.pipeRegister(beanDefinitionName, pipeViewPath, clazz);
 
                         } else if ( PlumberBarrier.class.isAssignableFrom(clazz) ) {
 
                             beanDefinition.setScope("prototype"); // reset PlumberBarrier scope
-                            String barrierViewName = getViewName(beanDefinitionName, beanDefinition);
-                            PlumberWorkerDefinitionsRepo.barrierRegister(beanDefinitionName, barrierViewName, clazz);
+                            String barrierViewPath = getViewPath(beanDefinitionName, beanDefinition);
+                            PlumberWorkerDefinitionsRepo.barrierRegister(beanDefinitionName, barrierViewPath, clazz);
 
                         } else if ( Plumber.class.isAssignableFrom(clazz) ) {
 
@@ -116,18 +116,23 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
         }
     }
 
-    private static String getViewName(String beanName, BeanDefinition beanDefinition) {
-        String viewName = beanName;
+    private static String getViewPath(String beanName, BeanDefinition beanDefinition) {
+
+        String viewPath = null;
         MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
-        PropertyValue propertyValue = propertyValues.getPropertyValue("viewName");
+        PropertyValue propertyValue = propertyValues.getPropertyValue("viewPath");
         if ( propertyValue!=null ) {
             TypedStringValue typedStringValue = (TypedStringValue) propertyValue.getValue();
             String value = typedStringValue.getValue();
             if ( StringUtils.isNotEmpty(value) ) {
-                viewName = value;
+                viewPath = value;
             }
         }
-        return viewName;
+
+        if ( StringUtils.isEmpty(viewPath) )
+            throw new PlumberInitializeFailureException(beanName + " can not without viewPath");
+
+        return viewPath;
     }
 
 

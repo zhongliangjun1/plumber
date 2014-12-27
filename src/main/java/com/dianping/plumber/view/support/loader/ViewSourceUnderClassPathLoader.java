@@ -19,11 +19,7 @@ import java.io.IOException;
 public class ViewSourceUnderClassPathLoader implements ViewSourceLoader {
 
     @Override
-    public String load(String viewName) {
-
-        String path = PlumberConfig.getViewResourcesPath()
-                + "/" + viewName
-                + PlumberConfig.getViewSuffix();
+    public String load(String viewPath) {
 
         String encoding = PlumberConfig.getViewEncoding();
         if (StringUtils.isEmpty(encoding)) {
@@ -32,10 +28,11 @@ public class ViewSourceUnderClassPathLoader implements ViewSourceLoader {
 
         String viewSource;
         try {
-            viewSource = ResourceUtils.getResourceFromClassPath(path, encoding);
+            viewSource = ResourceUtils.getResourceFromClassPath(viewPath, encoding);
         } catch (IOException e) {
-            throw new ViewSourceNotFoundException("can not find viewSource under your classpath : "+path, e);
+            throw new ViewSourceNotFoundException("can not find viewSource under your classpath : "+viewPath, e);
         }
+
         return viewSource;
     }
 

@@ -13,7 +13,7 @@ import java.util.List;
 public class PlumberControllerDefinition {
 
     private String name;
-    private String viewName;
+    private String viewPath;
     private String viewSource;
 
     private List<String> barrierNames;
@@ -51,12 +51,12 @@ public class PlumberControllerDefinition {
         this.name = name;
     }
 
-    public String getViewName() {
-        return viewName;
+    public String getViewPath() {
+        return viewPath;
     }
 
-    public void setViewName(String viewName) {
-        this.viewName = viewName;
+    public void setViewPath(String viewPath) {
+        this.viewPath = viewPath;
     }
 
     public String getViewSource() {

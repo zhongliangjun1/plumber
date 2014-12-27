@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public abstract class PlumberController {
 
-    protected String viewName;
+    protected String viewPath;
 
     /**
      * entrance of request. Controller should prepare common params for its pagelets ,
@@ -25,11 +25,11 @@ public abstract class PlumberController {
      */
     public abstract ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsForPagelets, Map<String, Object> modelForView);
 
-    public String getViewName() {
-        return viewName;
+    public String getViewPath() {
+        return viewPath;
     }
 
-    public void setViewName(String viewName) {
-        this.viewName = viewName;
+    public void setViewPath(String viewPath) {
+        this.viewPath = viewPath;
     }
 }
