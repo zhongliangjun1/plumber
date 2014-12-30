@@ -11,16 +11,38 @@ import com.dianping.plumber.core.PlumberGlobals;
  */
 public class PlumberConfig {
 
+    public static final String ConfigOverriderFactory = "configOverriderFactory";
+    public static final String ViewEncoding = "view.encoding";
+    public static final String ViewSourceLoaderFactory = "view.viewSourceLoaderFactory";
+    public static final String ViewRendererFactory = "view.viewRendererFactory";
+    public static final String ConcurrentCorePoolSize = "concurrent.threadPool.corePoolSize";
+    public static final String ConcurrentMaximumPoolSize = "concurrent.threadPool.maximumPoolSize";
+    public static final String ConcurrentKeepAliveTime = "concurrent.threadPool.keepAliveTime";
+    public static final String ConcurrentBlockingQueueCapacity = "concurrent.threadPool.blockingQueueCapacity";
+
+    public static String getConfigOverriderFactory() {
+        return Configuration.get(ConfigOverriderFactory, String.class);
+    }
+
     public static String getViewEncoding() {
-        return Configuration.get("view.encoding", PlumberGlobals.DEFAULT_VIEW_ENCODING, String.class);
+        if ( PlumberConfigOverrider.getOverrideConfiguration(ViewEncoding)!=null ) {
+            return PlumberConfigOverrider.getOverrideConfiguration(ViewEncoding);
+        }
+        return Configuration.get(ViewEncoding, PlumberGlobals.DEFAULT_VIEW_ENCODING, String.class);
     }
 
     public static String getViewSourceLoaderFactory() {
-        return Configuration.get("view.viewSourceLoaderFactory", String.class);
+        if ( PlumberConfigOverrider.getOverrideConfiguration(ViewSourceLoaderFactory)!=null ) {
+            return PlumberConfigOverrider.getOverrideConfiguration(ViewSourceLoaderFactory);
+        }
+        return Configuration.get(ViewSourceLoaderFactory, String.class);
     }
 
     public static String getViewRendererFactory() {
-        return Configuration.get("view.viewRendererFactory", String.class);
+        if ( PlumberConfigOverrider.getOverrideConfiguration(ViewRendererFactory)!=null ) {
+            return PlumberConfigOverrider.getOverrideConfiguration(ViewRendererFactory);
+        }
+        return Configuration.get(ViewRendererFactory, String.class);
     }
 
     public static String getPipeViewPlaceHolder() {
@@ -32,19 +54,31 @@ public class PlumberConfig {
     }
 
     public static int getConcurrentCorePoolSize() {
-        return Configuration.get("concurrent.threadPool.corePoolSize", PlumberGlobals.DEFAULT_CONCURRENT_COREPOOLSIZE, Integer.class);
+        if ( PlumberConfigOverrider.getOverrideConfiguration(ConcurrentCorePoolSize)!=null ) {
+            return PlumberConfigOverrider.getOverrideConfiguration(ConcurrentCorePoolSize);
+        }
+        return Configuration.get(ConcurrentCorePoolSize, PlumberGlobals.DEFAULT_CONCURRENT_COREPOOLSIZE, Integer.class);
     }
 
     public static int getConcurrentMaximumPoolSize() {
-        return Configuration.get("concurrent.threadPool.maximumPoolSize", PlumberGlobals.DEFAULT_CONCURRENT_MAXIMUMPOOLSIZE, Integer.class);
+        if ( PlumberConfigOverrider.getOverrideConfiguration(ConcurrentMaximumPoolSize)!=null ) {
+            return PlumberConfigOverrider.getOverrideConfiguration(ConcurrentMaximumPoolSize);
+        }
+        return Configuration.get(ConcurrentMaximumPoolSize, PlumberGlobals.DEFAULT_CONCURRENT_MAXIMUMPOOLSIZE, Integer.class);
     }
 
     public static int getConcurrentKeepAliveTime() {
-        return Configuration.get("concurrent.threadPool.keepAliveTime", PlumberGlobals.DEFAULT_CONCURRENT_KEEPALIVETIME, Integer.class);
+        if ( PlumberConfigOverrider.getOverrideConfiguration(ConcurrentKeepAliveTime)!=null ) {
+            return PlumberConfigOverrider.getOverrideConfiguration(ConcurrentKeepAliveTime);
+        }
+        return Configuration.get(ConcurrentKeepAliveTime, PlumberGlobals.DEFAULT_CONCURRENT_KEEPALIVETIME, Integer.class);
     }
 
     public static int getConcurrentBlockingQueueCapacity() {
-        return Configuration.get("concurrent.threadPool.blockingQueueCapacity", PlumberGlobals.DEFAULT_CONCURRENT_BLOCKINGQUEUECAPACITY, Integer.class);
+        if ( PlumberConfigOverrider.getOverrideConfiguration(ConcurrentBlockingQueueCapacity)!=null ) {
+            return PlumberConfigOverrider.getOverrideConfiguration(ConcurrentBlockingQueueCapacity);
+        }
+        return Configuration.get(ConcurrentBlockingQueueCapacity, PlumberGlobals.DEFAULT_CONCURRENT_BLOCKINGQUEUECAPACITY, Integer.class);
     }
 
 

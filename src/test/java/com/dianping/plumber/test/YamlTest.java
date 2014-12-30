@@ -17,12 +17,10 @@ public class YamlTest {
     public static void main(String[] args) throws Exception {
         String text = ResourceUtils.getResourceFromClassPath(PlumberGlobals.CONFIG_PATH, "UTF-8");
         Yaml yaml = new Yaml(text);
-        String resourcesPath = yaml.get("view.resourcesPath", String.class);
-        String suffix = yaml.get("view.suffix", String.class);
-        String rendererFactory = yaml.get("view.rendererFactory", String.class);
-        System.out.println(resourcesPath);  // resourcesPath : "/view"
-        System.out.println(suffix);  // .ftl
-        System.out.println(rendererFactory);  // com.dianping.plumber.view.ViewRendererFactory
+        String configOverriderFactory = yaml.get("configOverriderFactory", String.class);
+        String viewRendererFactory = yaml.get("view.viewRendererFactory", String.class);
+        System.out.println(configOverriderFactory);
+        System.out.println(viewRendererFactory);
     }
 
 }

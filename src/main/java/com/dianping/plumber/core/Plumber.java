@@ -1,8 +1,12 @@
 package com.dianping.plumber.core;
 
+import com.dianping.plumber.config.PlumberConfig;
+import com.dianping.plumber.config.PlumberConfigOverrider;
+import com.dianping.plumber.config.PlumberConfigOverriderFactory;
 import com.dianping.plumber.exception.PlumberInitializeFailureException;
 import com.dianping.plumber.exception.PlumberRuntimeException;
 import com.dianping.plumber.utils.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
@@ -25,6 +29,8 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAware {
+
+    private static Logger logger = Logger.getLogger(Plumber.class);
 
     private ApplicationContext applicationContext;
 
@@ -49,8 +55,24 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        loadOverrideConfiguration();
         resetPlumberWorkerScopeAndRegister(beanFactory);
         prepareWorkerDefinitions();
+    }
+
+    private static void loadOverrideConfiguration() {
+        String configOverriderFactory = PlumberConfig.getConfigOverriderFactory();
+        if ( StringUtils.isNotEmpty(configOverriderFactory) ) {
+            try {
+                Class clazz = Class.forName(configOverriderFactory);
+                PlumberConfigOverriderFactory factory = (PlumberConfigOverriderFactory) clazz.newInstance();
+                PlumberConfigOverrider overrider = factory.getConfigOverrider();
+                overrider.override();
+            } catch (Exception e) {
+                throw new PlumberInitializeFailureException("can not load your override configurations",e);
+            }
+            logger.info("plumber : load override configurations success");
+        }
     }
 
     private static volatile boolean hasReset = false;
@@ -102,6 +124,7 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
                     }
 
                 }
+                logger.info("plumber : reset worker's scope and register to definitions repo success");
             }
         }
     }
@@ -113,6 +136,7 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
     private static void prepareWorkerDefinitions() {
         if ( !hasPrepared ) {
             PlumberWorkerDefinitionsRepo.prepareWorkerDefinitions();
+            logger.info("plumber : prepare worker's definitions success");
         }
     }
 
