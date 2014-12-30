@@ -1,6 +1,9 @@
 package com.dianping.plumber.core;
 
+import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.view.ViewRenderer;
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -40,8 +43,25 @@ public class PlumberPipeWorker extends PlumberWorker {
                 pipeRenderResultQueue.put(PlumberGlobals.EMPTY_RENDER_RESULT);
             }
         } catch (Exception e) {
+
+            try {
+                if ( isDevEnv() ) {
+                    pipeRenderResultQueue.put(ExceptionUtils.getFullStackTrace(e));
+                } else {
+                    pipeRenderResultQueue.put(PlumberGlobals.EMPTY_RENDER_RESULT);
+                }
+            } catch (InterruptedException e1) {
+                logger.error("terrible!", e1);
+            }
+
             String msg = "pipe " + definition.getName() + " execute failure";
             logger.error(msg, e);
+
         }
     }
+
+    private static boolean isDevEnv() {
+        return PlumberGlobals.DEV_ENV.equals(PlumberConfig.getEnv());
+    }
+
 }

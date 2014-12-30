@@ -1,6 +1,8 @@
 package com.dianping.plumber.core;
 
+import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.view.ViewRenderer;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,11 +51,20 @@ public class PlumberBarrierWorker extends PlumberWorker {
                 barrierRenderResults.put(name, PlumberGlobals.EMPTY_RENDER_RESULT);
             }
         } catch (Exception e) {
-            barrierRenderResults.put(name, PlumberGlobals.EMPTY_RENDER_RESULT);
+            if ( isDevEnv() ) {
+                barrierRenderResults.put(name, ExceptionUtils.getFullStackTrace(e));
+            } else {
+                barrierRenderResults.put(name, PlumberGlobals.EMPTY_RENDER_RESULT);
+            }
             String msg = "barrier " + name + " execute failure";
             logger.error(msg, e);
         } finally {
             latch.countDown();
         }
     }
+
+    private static boolean isDevEnv() {
+        return PlumberGlobals.DEV_ENV.equals(PlumberConfig.getEnv());
+    }
+
 }

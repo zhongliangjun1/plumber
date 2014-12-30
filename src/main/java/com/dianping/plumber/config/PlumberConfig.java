@@ -12,6 +12,7 @@ import com.dianping.plumber.core.PlumberGlobals;
 public class PlumberConfig {
 
     public static final String ConfigOverriderFactory = "configOverriderFactory";
+    public static final String Env = "env";
     public static final String ViewEncoding = "view.encoding";
     public static final String ViewSourceLoaderFactory = "view.viewSourceLoaderFactory";
     public static final String ViewRendererFactory = "view.viewRendererFactory";
@@ -22,6 +23,13 @@ public class PlumberConfig {
 
     public static String getConfigOverriderFactory() {
         return Configuration.get(ConfigOverriderFactory, String.class);
+    }
+
+    public static String getEnv() {
+        if ( PlumberConfigOverrider.getOverrideConfiguration(Env)!=null ) {
+            return PlumberConfigOverrider.getOverrideConfiguration(Env);
+        }
+        return Configuration.get(Env, PlumberGlobals.DEV_ENV, String.class);
     }
 
     public static String getViewEncoding() {

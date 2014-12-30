@@ -1,4 +1,5 @@
 configOverriderFactory:  # for implementing configuration external
+env: dev
 view:
     encoding: UTF-8
     viewSourceLoaderFactory: com.dianping.plumber.view.support.loader.ViewSourceUnderClassPathLoaderFactory
