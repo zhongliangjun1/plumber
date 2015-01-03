@@ -1,12 +1,17 @@
 #plumber
 
-**plumber** 是一款实现页面 pagelet 并发执行的 java web 框架，并支持 BigPipe 的返回方式，以一切可以并发的方式提高你的页面响应速度。
+**plumber** 是一款实现页面 pagelet 并发执行的 java web 框架，并支持以 [**BigPipe**](http://www.cubrid.org/blog/dev-platform/faster-web-page-loading-with-facebook-bigpipe/) 的方式返回你的 pagelet 执行结果，以一切可能并发的方式提高你的页面响应速度。
+
+
 
 ##Core Features
 
 * 支持将页面划分成多个可以并发执行的 pagelet , 每个 pagelet 有着自身独立的 mvc , 同时不同页面也可以复用这些 pagelet 。
 
 * pagelet 提供同步 ( **barrier** ) 和异步 ( **pipe** ) 两种返回方式， **barrier** 方式实现的所有 pagelet 将作为页面的首次内容返回， **pipe** 方式实现的 pagelet 将在自身执行完成后以 [**BigPipe**](http://www.cubrid.org/blog/dev-platform/faster-web-page-loading-with-facebook-bigpipe/) 的方式继续返回给客户端。
+
+
+
 
 ##WorkFlow
 ![image](http://img.hb.aicdn.com/43b62f21e78717f8fb35bf4c47dfbb91a998661ad188-A01agD_fw658)
@@ -16,6 +21,8 @@
 当然用户并不需要关心具体 pagelet 具体的执行和返回顺序，这些都将由 **plumber** 来控制和保证，用户只需要在 **controller** 层通过框架提供的 **pb-barrier** 和 **pb-pipe** 这两个页面标签，来设置哪些 pagelet 为 **barrier** 类型，它们作为第一次 response 返回，哪些 pagelet 为 **pipe** 类型以 BigPipe 的方式后续继续返回。
 
 一个 request 经由 struts/spring mvc 等 web 框架转发进入 **plumber** 的运行环境后，执行代码即为需要用户来实现的一个 **controller** 加多个 **barrier** 或 **pipe** 。
+
+
 
 
 ##Getting Started
