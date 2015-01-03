@@ -266,7 +266,7 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 如果你跟着我们一步一步做，至此你应该已经可以将这个 demo 部署到任意 web 容器，run 起来看一下执行结果了。
 
-同时，你也可以打开控制台，看一下这个 request 请求，是不是和我一样，response header 中包含 Transfer-Encoding:chunked。 事实上 **plumber** 中 BigPipe 的实现正是基于 http [**chunked**](http://zh.wikipedia.org/wiki/%E5%88%86%E5%9D%97%E4%BC%A0%E8%BE%93%E7%BC%96%E7%A0%81) 来达成的。
+同时，你也可以打开浏览器控制台，看一下这个 request 请求，是不是和我一样，response header 中包含 Transfer-Encoding:chunked。 事实上 **plumber** 中 BigPipe 的实现正是基于 http [**chunked**](http://zh.wikipedia.org/wiki/%E5%88%86%E5%9D%97%E4%BC%A0%E8%BE%93%E7%BC%96%E7%A0%81) 来达成的。
 
 上述 demo 的所有代码，你均可以在 [plumber-tutorial](https://github.com/zhongliangjun1/plumber-tutorial) 中找到。
 
