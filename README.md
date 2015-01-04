@@ -18,7 +18,7 @@
 
 为设置、解析和控制 **barrier** **pipe** 等不同类型 pagelet， 保证它们的执行和返回顺序， **plumber** 有着自己的 **controller** ，在与 struts/spring mvc 等 web 框架一同运用的时候，strtus 等 MVC 框架的C将只承担请求参数转发的作用，真正的 control 逻辑需要用户在 **plumber** 的 **controller** 层来完成。
 
-当然用户并不需要关心具体 pagelet 具体的执行和返回顺序，这些都将由 **plumber** 来控制和保证，用户只需要在 **controller** 层通过框架提供的 **pb-barrier** 和 **pb-pipe** 这两个页面标签，来设置哪些 pagelet 为 **barrier** 类型，它们作为第一次 response 返回，哪些 pagelet 为 **pipe** 类型以 BigPipe 的方式后续继续返回。
+当然用户并不需要关心 pagelet 具体的执行和返回顺序，这些都将由 **plumber** 来控制和保证，用户只需要在 **controller** 层通过框架提供的 **pb-barrier** 和 **pb-pipe** 这两个页面标签，来设置哪些 pagelet 为 **barrier** 类型，它们作为第一次 response 返回，哪些 pagelet 为 **pipe** 类型以 BigPipe 的方式后续继续返回。
 
 一个 request 经由 struts/spring mvc 等 web 框架转发进入 **plumber** 的运行环境后，执行代码即为需要用户来实现的一个 **controller** 加多个用户自主划分的 **barrier** 或 **pipe** 。
 
