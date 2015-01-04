@@ -204,9 +204,9 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
         @Override
         public ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsFromController, Map<String, Object> modelForView) {
 
-            String demoDesc = paramsFromRequest.get("demoDesc");
+            String demoDesc = (String) paramsFromRequest.get("demoDesc");
 
-            String param = paramsFromController.get("param");
+            String param = (String) paramsFromController.get("param");
 
             modelForView.put("msg", "Get HeadBarrier Content! "+ param + " " + demoDesc);
 
@@ -279,3 +279,124 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 
 
+##Advanced
+
+###1) plumber.yaml 配置详解
+
+	configOverriderFactory: com.dianping.plumber.DemoConfigOverriderFactory
+	env: dev
+	view:
+	    encoding: UTF-8
+	    viewSourceLoaderFactory: com.dianping.plumber.view.support.loader.ViewSourceUnderWebContextLoaderFactory
+	    viewRendererFactory: com.dianping.plumber.view.support.renderer.freemarker.FreemarkerRendererFactory
+	concurrent:
+	    timeout: 1000
+	    threadPool:
+	        corePoolSize: 50
+	        maximumPoolSize: 50
+	        keepAliveTime: 0
+	        blockingQueueCapacity: 1000
+	        
+配置介绍：
+
+* **configOverriderFactory** 用于实现配置外部化。你可以提供一个 PlumberConfigOverriderFactory 的实现，在该 factory 生产的 PlumberConfigOverrider 中覆盖 plumber.yaml 中的配置。
+
+* **env** 配置为 dev 环境时（ 默认为 dev ），**plumber** 会直接将抛出异常的 pagelet 的错误堆栈信息作为模块内容输出到页面上，便于查看出错信息，配置为 product 时，**plumber** 将丢弃该 pagelet ，仅输出页面其余 pagelet 内容。你可以通过 **configOverriderFactory** 确保生产环境对该配置的覆盖，避免 dev/product 频繁切换造成疏漏。
+
+* **encoding** 页面模板文件的编码方式。
+
+* **viewSourceLoaderFactory** 页面模板文件 loader 的工厂类。 **plumber** 提供了从 classpath 和 WEB-INF 下加载页面模板文件的两种默认实现： ViewSourceUnderClassPathLoaderFactory 和 ViewSourceUnderWebContextLoaderFactory。需要注意的是，使用 ViewSourceUnderWebContextLoaderFactory 时需要在 web.xml 中将 ViewSourceUnderWebContextLoader 添加为 listener ，且须在 spring 的 ContextLoaderListener 之前。
+
+* **viewRendererFactory** 页面模板引擎的工厂类。 **plumber** 默认提供了对 freemarker 引擎的支持：FreemarkerRendererFactory ，当然你也可以使用任意其他模板引擎，提供一个 ViewRendererFactory 的实现即可。
+
+* **concurrent** plumber 线程池的相关配置，你可以根据自己的业务特性做相应调整。
+
+
+###2) 注解使用 @ParamFromRequest @ParamFromController
+
+在 **plumber** 的 **controller** 中你可以获取从 struts/spring mvc 等 web 框架转发来的请求参数( **Map<String, Object> paramsFromRequest** )，同时也可以在 **Map<String, Object> paramsForPagelets** 中为下一级的 **barrier** 或 **pipe** prepare 一些共用参数：
+
+	public abstract class PlumberController {
+
+        ...
+
+        /**
+         * entrance of request. Controller should prepare common params for its pagelets ,
+         * then execute its business logic to fill the modelForView.
+         * View of this Controller will be the first time response send to client,
+         * you can also set pagelets to be barrier ,then it will be sent with this view.
+         * @param paramsFromRequest
+         * @param paramsForPagelets
+         * @param modelForView
+         * @return
+         */
+        public abstract ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsForPagelets, Map<String, Object> modelForView);
+
+        ...
+    }
+而在 **plumber** 的 **barrier** 或 **pipe** 中，你则既可以从 **Map<String, Object> paramsFromRequest** 中获取转发来的请求参数，又可以从 **Map<String, Object> paramsFromController** 中获取由 **controller** prepare 的共用参数：
+
+	public interface PlumberPagelet {
+
+        public ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsFromController, Map<String, Object> modelForView);
+
+    }
+
+但是反复从 Map 中获取参数，并且做类型强转是一件相对麻烦的事情，**plumber** 提供了 **@ParamFromRequest** 和 **@ParamFromController** 这样两个注解，为你解决这个问题。
+
+例如 PlumberBarrier 原来是这样写：
+
+	public class HeadBarrier extends PlumberBarrier {
+
+        private Logger logger = Logger.getLogger(RightBarrier.class);
+
+        @Override
+        public ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsFromController, Map<String, Object> modelForView) {
+
+            String demoDesc = (String) paramsFromRequest.get("demoDesc");
+
+            String param = (String) paramsFromController.get("param");
+
+            modelForView.put("msg", "Get HeadBarrier Content! "+ param + " " + demoDesc);
+
+            try {
+                Thread.sleep(40);
+            } catch (InterruptedException e) {
+                logger.error(e);
+            }
+
+            return ResultType.SUCCESS;
+        }
+
+    }
+
+现在可以这样写：
+
+	public class HeadBarrier extends PlumberBarrier {
+
+        private Logger logger = Logger.getLogger(RightBarrier.class);
+
+        @ParamFromController
+        private String param;
+
+        @ParamFromRequest
+        private String demoDesc;
+
+        @Override
+        public ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsFromController, Map<String, Object> modelForView) {
+
+            modelForView.put("msg", "Get HeadBarrier Content! "+ param + " " + demoDesc);
+            try {
+                Thread.sleep(40);
+            } catch (InterruptedException e) {
+                logger.error(e);
+            }
+
+            return ResultType.SUCCESS;
+        }
+
+    }
+    
+打过注解的成员变量，**plumber** 将以你的参数名为 key , 自动到相应的 Map 中去获取对应的 value ，帮你做类型转换，然后注入进来。 
+
+**@ParamFromRequest** 可以在 **controller** **barrier** 和 **pipe** 中使用， 而 **@ParamFromController** 则只可以在 **barrier** 和 **pipe** 中使用。
