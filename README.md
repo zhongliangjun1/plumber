@@ -1,6 +1,6 @@
 #plumber
 
-**plumber** 是一款实现页面 pagelet 并发执行的 java web 框架，并支持以 [**BigPipe**](http://www.cubrid.org/blog/dev-platform/faster-web-page-loading-with-facebook-bigpipe/) 的方式返回你的 pagelet 执行结果，以一切可能并发的方式提高你的页面响应速度。
+**plumber** 是一款实现页面 pagelet 并发执行的 java web 框架，支持以 [**BigPipe**](http://www.cubrid.org/blog/dev-platform/faster-web-page-loading-with-facebook-bigpipe/) 的方式返回你的 pagelet 执行结果，以一切可能并发的方式提高你的页面响应速度。
 
 
 
