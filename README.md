@@ -285,6 +285,7 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 	configOverriderFactory: com.dianping.plumber.DemoConfigOverriderFactory
 	env: dev
+	responseContentType: text/html;charset=UTF-8
 	view:
 	    encoding: UTF-8
 	    viewSourceLoaderFactory: com.dianping.plumber.view.support.loader.ViewSourceUnderWebContextLoaderFactory
@@ -302,6 +303,8 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 * **configOverriderFactory** 用于实现配置外部化。你可以提供一个 PlumberConfigOverriderFactory 的实现，在该 factory 生产的 PlumberConfigOverrider 中覆盖 plumber.yaml 中的配置。
 
 * **env** 配置为 dev 环境时（ 默认为 product ），**plumber** 会直接将抛出异常的 pagelet 的错误堆栈信息作为模块内容输出到页面上，便于查看出错信息，配置为 product 时，**plumber** 将丢弃该 pagelet ，仅输出页面其余 pagelet 内容。你可以通过 **configOverriderFactory** 确保生产环境对该配置的覆盖，避免 dev/product 频繁切换造成疏漏。
+
+* **responseContentType** 设置 response 的 Content-Type。
 
 * **encoding** 页面模板文件的编码方式。
 
