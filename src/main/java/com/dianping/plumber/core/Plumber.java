@@ -37,12 +37,27 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
 
     public ResultType execute(String plumberControllerName, Map<String, Object> paramsForController,
                         HttpServletRequest request,  HttpServletResponse response) {
+
+        prepare(plumberControllerName, response);
+
         InvocationContext invocationContext = new InvocationContext(plumberControllerName, applicationContext,
                 paramsForController, request, response);
         try {
              return invocationContext.invoke();
         } catch (Exception e) {
             throw new PlumberRuntimeException(e);
+        }
+    }
+
+    private void prepare(String plumberControllerName, HttpServletResponse response) {
+        if ( StringUtils.isEmpty(plumberControllerName) || applicationContext.getBean(plumberControllerName)==null )
+            throw new PlumberRuntimeException(new IllegalArgumentException("invalid controllerName : " + plumberControllerName ));
+
+        if ( response==null )
+            throw new PlumberRuntimeException(new IllegalArgumentException("response can not be null"));
+
+        if ( StringUtils.isEmpty(response.getContentType()) ) {
+            response.setContentType( PlumberConfig.getResponseContentType() );
         }
     }
 

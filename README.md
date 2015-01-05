@@ -186,7 +186,7 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 而名为 mainPipe 这个 **pipe** 类型的 pagelet 将继续执行，待它执行完成后，将以 [**chunked**](http://zh.wikipedia.org/wiki/%E5%88%86%E5%9D%97%E4%BC%A0%E8%BE%93%E7%BC%96%E7%A0%81) 的方式继续往客户端发送。如果你有多个 **pipe** 类型的 pagelet 的话，他们将无干扰的在各自执行完成后自行返回给客户端。
 
-也许你已经注意到在 demo.ftl 中，我们未曾将 < body > 和 < html > 标签闭合，这是理所当然的， demo.ftl 只是第一次返回给客户端的内容，此时页面 dom 并未完整， **pipe** 的执行结果作为页面的其余部分将继续以 **trunked** 的方式往客户端发送。如果将两个标签闭合后，浏览器将不再接受服务端的 response ，那样即使我们的 **pipe** 类型的 response 发送到客户端，浏览器也不会接受并加以解析。
+也许你已经注意到在 demo.ftl 中，我们未曾将 < body > 和 < html > 标签闭合，这是理所当然的， demo.ftl 只是第一次返回给客户端的内容，此时页面 dom 并未完整， **pipe** 的执行结果作为页面的其余部分将继续以 **chunked** 的方式往客户端发送。如果将两个标签闭合后，浏览器将不再接受服务端的 response ，那样即使我们的 **pipe** 类型的 response 发送到客户端，浏览器也不会接受并加以解析。
 
 所以如果你的页面中用到了 **pipe** 类型的 pagelet ，请不要为你的容器页面添加上述闭合标签， **plumber** 会在该页面的所有 **pipe** 类型的 pagelet 成功返回后自行补上该闭合标签。
 

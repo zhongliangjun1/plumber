@@ -15,6 +15,8 @@ public abstract class PlumberGlobals {
 
     public static final String PRODUCT_ENV = "product";
 
+    public static final String DEFAULT_RESPONSE_CONTENT_TYPE = "text/html;charset=UTF-8";
+
     public static final String DEFAULT_VIEW_ENCODING = "UTF-8";
 
     public static final int DEFAULT_BUFFER_SIZE = 1024;
