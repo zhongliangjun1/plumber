@@ -25,11 +25,15 @@ public class PlumberConfig {
         return Configuration.get(ConfigOverriderFactory, String.class);
     }
 
+    /**
+     * get the env of plumber, default to be product
+     * @return
+     */
     public static String getEnv() {
         if ( PlumberConfigOverrider.getOverrideConfiguration(Env)!=null ) {
             return PlumberConfigOverrider.getOverrideConfiguration(Env);
         }
-        return Configuration.get(Env, PlumberGlobals.DEV_ENV, String.class);
+        return Configuration.get(Env, PlumberGlobals.PRODUCT_ENV, String.class);
     }
 
     public static String getViewEncoding() {

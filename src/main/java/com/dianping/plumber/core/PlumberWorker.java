@@ -1,5 +1,6 @@
 package com.dianping.plumber.core;
 
+import com.dianping.plumber.config.PlumberConfig;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -39,6 +40,10 @@ public abstract class PlumberWorker implements Runnable {
 
     public Map<String, Object> getModelForView() {
         return modelForView;
+    }
+
+    protected static boolean isDevEnv() {
+        return PlumberGlobals.DEV_ENV.equals(PlumberConfig.getEnv());
     }
 
 

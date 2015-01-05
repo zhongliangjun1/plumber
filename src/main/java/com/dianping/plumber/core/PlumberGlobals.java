@@ -13,6 +13,8 @@ public abstract class PlumberGlobals {
 
     public static final String DEV_ENV = "dev";
 
+    public static final String PRODUCT_ENV = "product";
+
     public static final String DEFAULT_VIEW_ENCODING = "UTF-8";
 
     public static final int DEFAULT_BUFFER_SIZE = 1024;

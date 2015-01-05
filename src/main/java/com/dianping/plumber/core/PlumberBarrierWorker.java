@@ -63,8 +63,4 @@ public class PlumberBarrierWorker extends PlumberWorker {
         }
     }
 
-    private static boolean isDevEnv() {
-        return PlumberGlobals.DEV_ENV.equals(PlumberConfig.getEnv());
-    }
-
 }
