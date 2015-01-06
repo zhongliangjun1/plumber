@@ -38,7 +38,9 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
     public ResultType execute(String plumberControllerName, Map<String, Object> paramsForController,
                         HttpServletRequest request,  HttpServletResponse response) {
 
-        prepare(plumberControllerName, response);
+        validate(plumberControllerName, paramsForController, request, response);
+
+        prepare(plumberControllerName, paramsForController, request, response);
 
         InvocationContext invocationContext = new InvocationContext(plumberControllerName, applicationContext,
                 paramsForController, request, response);
@@ -49,17 +51,42 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
         }
     }
 
-    private void prepare(String plumberControllerName, HttpServletResponse response) {
+    public void validate(String plumberControllerName, Map<String, Object> paramsForController,
+                         HttpServletRequest request,  HttpServletResponse response) {
+
         if ( StringUtils.isEmpty(plumberControllerName) || applicationContext.getBean(plumberControllerName)==null )
             throw new PlumberRuntimeException(new IllegalArgumentException("invalid controllerName : " + plumberControllerName ));
 
         if ( response==null )
             throw new PlumberRuntimeException(new IllegalArgumentException("response can not be null"));
+    }
 
-        if ( StringUtils.isEmpty(response.getContentType()) ) {
-            response.setContentType( PlumberConfig.getResponseContentType() );
+    private void prepare(String plumberControllerName, Map<String, Object> paramsForController,
+                         HttpServletRequest request,  HttpServletResponse response) {
+
+        setResponseContentType(response);
+
+    }
+
+    private void setResponseContentType(HttpServletResponse response) {
+
+        if ( StringUtils.isNotEmpty(response.getContentType()) )
+            return;
+
+        String contentType = PlumberConfig.getResponseContentType();
+        boolean noCharsetInContentType = true;
+        if ( contentType.toLowerCase().indexOf("charset=")!=-1 )
+            noCharsetInContentType = false;
+
+        if (noCharsetInContentType) {
+            response.setContentType(
+                    contentType + "; charset=" + PlumberConfig.getViewEncoding());
+        } else {
+            response.setContentType(contentType);
         }
     }
+
+
 
 
 
