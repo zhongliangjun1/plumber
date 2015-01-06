@@ -1,6 +1,7 @@
 package com.dianping.plumber.config;
 
 import com.dianping.plumber.core.PlumberGlobals;
+import org.apache.log4j.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,6 +11,8 @@ import com.dianping.plumber.core.PlumberGlobals;
  * To change this template use File | Settings | File Templates.
  */
 public class PlumberConfig {
+
+    private static Logger logger = Logger.getLogger(PlumberConfig.class);
 
     public static final String ConfigOverriderFactory = "configOverriderFactory";
     public static final String Env = "env";
@@ -75,28 +78,48 @@ public class PlumberConfig {
 
     public static int getConcurrentCorePoolSize() {
         if ( PlumberConfigOverrider.getOverrideConfiguration(ConcurrentCorePoolSize)!=null ) {
-            return PlumberConfigOverrider.getOverrideConfiguration(ConcurrentCorePoolSize);
+            try {
+                return (Integer) PlumberConfigOverrider.getOverrideConfiguration(ConcurrentCorePoolSize);
+            } catch (Exception e) {
+                String msg = "load your override configuration of " + ConcurrentCorePoolSize + " failure, plumber turn to use the default configuration";
+                logger.error(msg, e);
+            }
         }
         return Configuration.get(ConcurrentCorePoolSize, PlumberGlobals.DEFAULT_CONCURRENT_COREPOOLSIZE, Integer.class);
     }
 
     public static int getConcurrentMaximumPoolSize() {
         if ( PlumberConfigOverrider.getOverrideConfiguration(ConcurrentMaximumPoolSize)!=null ) {
-            return PlumberConfigOverrider.getOverrideConfiguration(ConcurrentMaximumPoolSize);
+            try {
+                return (Integer) PlumberConfigOverrider.getOverrideConfiguration(ConcurrentMaximumPoolSize);
+            } catch (Exception e) {
+                String msg = "load your override configuration of " + ConcurrentMaximumPoolSize + " failure, plumber turn to use the default configuration";
+                logger.error(msg, e);
+            }
         }
         return Configuration.get(ConcurrentMaximumPoolSize, PlumberGlobals.DEFAULT_CONCURRENT_MAXIMUMPOOLSIZE, Integer.class);
     }
 
     public static int getConcurrentKeepAliveTime() {
         if ( PlumberConfigOverrider.getOverrideConfiguration(ConcurrentKeepAliveTime)!=null ) {
-            return PlumberConfigOverrider.getOverrideConfiguration(ConcurrentKeepAliveTime);
+            try {
+                return (Integer) PlumberConfigOverrider.getOverrideConfiguration(ConcurrentKeepAliveTime);
+            } catch (Exception e) {
+                String msg = "load your override configuration of " + ConcurrentKeepAliveTime + " failure, plumber turn to use the default configuration";
+                logger.error(msg, e);
+            }
         }
         return Configuration.get(ConcurrentKeepAliveTime, PlumberGlobals.DEFAULT_CONCURRENT_KEEPALIVETIME, Integer.class);
     }
 
     public static int getConcurrentBlockingQueueCapacity() {
         if ( PlumberConfigOverrider.getOverrideConfiguration(ConcurrentBlockingQueueCapacity)!=null ) {
-            return PlumberConfigOverrider.getOverrideConfiguration(ConcurrentBlockingQueueCapacity);
+            try {
+                return (Integer) PlumberConfigOverrider.getOverrideConfiguration(ConcurrentBlockingQueueCapacity);
+            } catch (Exception e) {
+                String msg = "load your override configuration of " + ConcurrentBlockingQueueCapacity + " failure, plumber turn to use the default configuration";
+                logger.error(msg, e);
+            }
         }
         return Configuration.get(ConcurrentBlockingQueueCapacity, PlumberGlobals.DEFAULT_CONCURRENT_BLOCKINGQUEUECAPACITY, Integer.class);
     }
