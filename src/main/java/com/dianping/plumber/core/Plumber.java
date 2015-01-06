@@ -78,7 +78,7 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
         if ( contentType.toLowerCase().indexOf("charset=")!=-1 )
             noCharsetInContentType = false;
 
-        if (noCharsetInContentType) {
+        if ( noCharsetInContentType ) {
             response.setContentType(
                     contentType + "; charset=" + PlumberConfig.getViewEncoding());
         } else {
