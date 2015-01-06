@@ -51,7 +51,7 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
         }
     }
 
-    public void validate(String plumberControllerName, Map<String, Object> paramsForController,
+    private void validate(String plumberControllerName, Map<String, Object> paramsForController,
                          HttpServletRequest request,  HttpServletResponse response) {
 
         if ( StringUtils.isEmpty(plumberControllerName) || applicationContext.getBean(plumberControllerName)==null )
