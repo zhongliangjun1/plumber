@@ -47,7 +47,9 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
         try {
              return invocationContext.invoke();
         } catch (Exception e) {
-            throw new PlumberRuntimeException(e);
+            Exception runtimeException = new PlumberRuntimeException(e);
+            logger.error("some exception occured during the running time", runtimeException);
+            return ResultType.ERROR;
         }
     }
 
