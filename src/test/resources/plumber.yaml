@@ -1,6 +1,8 @@
 configOverriderFactory:  # for implementing configuration external
 env: dev
-responseContentType: text/html;charset=UTF-8
+response:
+    contentType: text/html;charset=UTF-8
+    timeout: 10000
 view:
     encoding: UTF-8
     viewSourceLoaderFactory: com.dianping.plumber.view.support.loader.ViewSourceUnderClassPathLoaderFactory

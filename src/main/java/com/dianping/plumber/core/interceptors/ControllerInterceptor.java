@@ -1,5 +1,6 @@
 package com.dianping.plumber.core.interceptors;
 
+import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.core.*;
 import com.dianping.plumber.exception.PlumberControllerNotFoundException;
 import com.dianping.plumber.exception.PlumberRuntimeException;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created with IntelliJ IDEA.
@@ -59,7 +61,10 @@ public class ControllerInterceptor implements Interceptor {
             int pipeNum = pipeDefinitions.size();
             LinkedBlockingQueue<String> pipeRenderResultQueue = invocation.getPipeRenderResultQueue();
             while ( pipeNum>0 ) {
-                String pipeRenderResult = pipeRenderResultQueue.take();
+                String pipeRenderResult = pipeRenderResultQueue.poll(PlumberConfig.getResponseTimeout(), TimeUnit.MILLISECONDS);
+                if ( pipeRenderResult==null ) { // timeout
+                    break;
+                }
                 if ( !PlumberGlobals.EMPTY_RENDER_RESULT.equals(pipeRenderResult) ) {
                     ResponseUtils.flushBuffer(response, pipeRenderResult);
                 }
@@ -69,6 +74,8 @@ public class ControllerInterceptor implements Interceptor {
             // only with pipes need to ensure html to be unclosed, and the close tag will be flushed by framework finally
             ResponseUtils.flushBuffer(response, PlumberGlobals.CHUNKED_END);
         }
+
+        invocation.getResultReturnedFlag().setReturned();
 
         return ResultType.SUCCESS;
     }

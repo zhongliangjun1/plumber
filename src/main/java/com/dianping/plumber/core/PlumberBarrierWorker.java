@@ -1,6 +1,6 @@
 package com.dianping.plumber.core;
 
-import com.dianping.plumber.config.PlumberConfig;
+import com.dianping.plumber.utils.StringUtils;
 import com.dianping.plumber.view.ViewRenderer;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
@@ -35,31 +35,43 @@ public class PlumberBarrierWorker extends PlumberWorker {
 
     @Override
     public void run() {
+
         String name = definition.getName();
+        String renderResult = PlumberGlobals.EMPTY_RENDER_RESULT;
+
         try {
+
             ResultType resultType = barrier.execute(paramsFromRequest, paramsFromController, modelForView);
+
             if ( resultType==ResultType.SUCCESS ) {
                 String viewSource = definition.getViewSource();
                 ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
-                String renderResult = viewRenderer.render(name, viewSource, modelForView);
-                if ( renderResult!=null ) { // protect ConcurrentHashMap
-                    barrierRenderResults.put(name, renderResult);
-                } else {
-                    barrierRenderResults.put(name, PlumberGlobals.EMPTY_RENDER_RESULT);
-                }
-            } else {
-                barrierRenderResults.put(name, PlumberGlobals.EMPTY_RENDER_RESULT);
+                String result = viewRenderer.render(name, viewSource, modelForView);
+                if ( StringUtils.isNotEmpty(result) )
+                    renderResult = result;
             }
+
         } catch (Exception e) {
+
             if ( isDevEnv() ) {
-                barrierRenderResults.put(name, ExceptionUtils.getFullStackTrace(e));
-            } else {
-                barrierRenderResults.put(name, PlumberGlobals.EMPTY_RENDER_RESULT);
+                String result = ExceptionUtils.getFullStackTrace(e);
+                if ( StringUtils.isNotEmpty(result) )
+                    renderResult = result;
             }
+
             String msg = "barrier " + name + " execute failure";
             logger.error(msg, e);
+
         } finally {
+
+            try {
+                barrierRenderResults.put(name, renderResult);
+            } catch (Exception e) {
+                logger.error("I don't know what would happen, but just to make sure latch.countDown() can be executed all the time ", e);
+            }
+
             latch.countDown();
+
         }
     }
 

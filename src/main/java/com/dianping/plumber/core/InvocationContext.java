@@ -34,6 +34,7 @@ public class InvocationContext {
     private final HttpServletResponse response;
     private final LinkedBlockingQueue<String> pipeRenderResultQueue = new LinkedBlockingQueue<String>();
 
+    private final ResultReturnedFlag resultReturnedFlag = new ResultReturnedFlag();
     private ResultType resultType;
 
 
@@ -99,4 +100,7 @@ public class InvocationContext {
         return response;
     }
 
+    public ResultReturnedFlag getResultReturnedFlag() {
+        return resultReturnedFlag;
+    }
 }

@@ -16,7 +16,8 @@ public class PlumberConfig {
 
     public static final String ConfigOverriderFactory = "configOverriderFactory";
     public static final String Env = "env";
-    public static final String ResponseContentType = "responseContentType";
+    public static final String ResponseContentType = "response.contentType";
+    public static final String ResponseTimeout = "response.timeout";
     public static final String ViewEncoding = "view.encoding";
     public static final String ViewSourceLoaderFactory = "view.viewSourceLoaderFactory";
     public static final String ViewRendererFactory = "view.viewRendererFactory";
@@ -45,6 +46,18 @@ public class PlumberConfig {
             return PlumberConfigOverrider.getOverrideConfiguration(ResponseContentType);
         }
         return Configuration.get(ResponseContentType, PlumberGlobals.DEFAULT_RESPONSE_CONTENT_TYPE, String.class);
+    }
+
+    public static int getResponseTimeout() {
+        if ( PlumberConfigOverrider.getOverrideConfiguration(ResponseTimeout)!=null ) {
+            try {
+                return (Integer) PlumberConfigOverrider.getOverrideConfiguration(ResponseTimeout);
+            } catch (Exception e) {
+                String msg = "load your override configuration of " + ResponseTimeout + " failure, plumber turn to use the default configuration";
+                logger.error(msg, e);
+            }
+        }
+        return Configuration.get(ResponseTimeout, PlumberGlobals.DEFAULT_RESPONSE_TIMEOUT, Integer.class);
     }
 
     public static String getViewEncoding() {
