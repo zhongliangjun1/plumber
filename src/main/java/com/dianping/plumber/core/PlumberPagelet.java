@@ -9,8 +9,18 @@ import java.util.Map;
  * Time: PM4:45
  * To change this template use File | Settings | File Templates.
  */
-public interface PlumberPagelet {
+public abstract class PlumberPagelet {
 
-    public ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsFromController, Map<String, Object> modelForView);
+    protected String viewPath;
+
+    public abstract ResultType execute(Map<String, Object> paramsFromRequest, Map<String, Object> paramsFromController, Map<String, Object> modelForView);
+
+    public String getViewPath() {
+        return viewPath;
+    }
+
+    public void setViewPath(String viewPath) {
+        this.viewPath = viewPath;
+    }
 
 }

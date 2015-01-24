@@ -7,15 +7,6 @@ package com.dianping.plumber.core;
  * Time: PM4:52
  * To change this template use File | Settings | File Templates.
  */
-public abstract class PlumberBarrier implements PlumberPagelet {
+public abstract class PlumberBarrier extends PlumberPagelet {
 
-    protected String viewPath;
-
-    public String getViewPath() {
-        return viewPath;
-    }
-
-    public void setViewPath(String viewPath) {
-        this.viewPath = viewPath;
-    }
 }
