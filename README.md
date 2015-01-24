@@ -32,7 +32,7 @@
 	<dependency>
 	  <groupId>com.dianping</groupId>
 	  <artifactId>plumber</artifactId>
-	  <version>1.0.0-SNAPSHOT</version>
+	  <version>1.2.0-SNAPSHOT</version>
 	</dependency>
 	
 ###2) 添加 plumber.yaml 配置
@@ -83,9 +83,15 @@ mainPipe 类似于微博中 feed 这样比较耗时的模块，为了缓解用�
             paramsForController.put("demoDesc", "StrutsDemo");
 
             HttpServletResponse response = ServletActionContext.getResponse();
-            plumber.execute(plumberControllerName, paramsForController, null, response);
-
-            return null;
+            HttpServletRequest request = ServletActionContext.getRequest();
+            
+            ResultType resultType = plumber.execute(plumberControllerName, paramsForController, request, response);
+            
+        	if ( resultType==ResultType.SUCCESS ) {
+            	return null;
+        	} else {
+            	return "error";
+        	}
         }
 
         public void setPlumber(Plumber plumber) {
@@ -97,6 +103,7 @@ mainPipe 类似于微博中 feed 这样比较耗时的模块，为了缓解用�
     <package name="struts" namespace="/struts" extends="struts-default">
 
         <action name="demo" class="com.dianping.struts.StrutsDemo">
+        	<result name="error">/error.jsp</result>
         </action>
 
     </package>
@@ -195,9 +202,9 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 
 
-#####PlumberBarrier
+#####Barrier
 
-	public class HeadBarrier extends PlumberBarrier {
+	public class HeadBarrier extends PlumberPagelet {
 
         private Logger logger = Logger.getLogger(RightBarrier.class);
 
@@ -232,8 +239,8 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
     
     
 
-#####PlumberPipe
-	public class MainPipe extends PlumberPipe {
+#####Pipe
+	public class MainPipe extends PlumberPagelet {
 
         private Logger logger = Logger.getLogger(MainPipe.class);
 
@@ -349,7 +356,7 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 例如 PlumberBarrier 原来是这样写：
 
-	public class HeadBarrier extends PlumberBarrier {
+	public class HeadBarrier extends PlumberPagelet {
 
         private Logger logger = Logger.getLogger(RightBarrier.class);
 
@@ -375,7 +382,7 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 现在可以这样写：
 
-	public class HeadBarrier extends PlumberBarrier {
+	public class HeadBarrier extends PlumberPagelet {
 
         private Logger logger = Logger.getLogger(RightBarrier.class);
 
