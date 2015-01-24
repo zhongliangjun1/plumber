@@ -35,7 +35,7 @@ public class PipeInterceptor implements Interceptor {
             Map<String, Object> paramsFromController = invocation.getParamsForPagelets();
             for (PlumberPipeDefinition definition : pipeDefinitions) {
                 String name = definition.getName();
-                PlumberPipe pipe = (PlumberPipe) invocation.getApplicationContext().getBean(name);
+                PlumberPagelet pipe = (PlumberPagelet) invocation.getApplicationContext().getBean(name);
                 injectAnnotationFields(pipe, definition, paramsFromRequest, paramsFromController);
                 LinkedBlockingQueue<String> pipeRenderResultQueue = invocation.getPipeRenderResultQueue();
                 ResultReturnedFlag resultReturnedFlag = invocation.getResultReturnedFlag();
@@ -47,7 +47,7 @@ public class PipeInterceptor implements Interceptor {
         return ResultType.SUCCESS;
     }
 
-    private void injectAnnotationFields(PlumberPipe pipe,
+    private void injectAnnotationFields(PlumberPagelet pipe,
                                         PlumberPipeDefinition pipeDefinition,
                                         Map<String, Object> paramsFromRequest,
                                         Map<String, Object> paramsFromController) {
@@ -62,7 +62,7 @@ public class PipeInterceptor implements Interceptor {
     }
 
     private void injectAnnotationFields(String pipeName,
-                                        PlumberPipe pipe,
+                                        PlumberPagelet pipe,
                                         List<Field> fields,
                                         Map<String, Object> params) {
 

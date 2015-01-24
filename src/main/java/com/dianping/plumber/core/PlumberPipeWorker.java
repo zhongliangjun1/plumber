@@ -19,14 +19,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class PlumberPipeWorker extends PlumberWorker {
 
-    private final PlumberPipe pipe;
+    private final PlumberPagelet pipe;
     private final LinkedBlockingQueue<String> pipeRenderResultQueue;
     private final ResultReturnedFlag resultReturnedFlag;
 
     public PlumberPipeWorker(PlumberPipeDefinition definition,
                              Map<String, Object> paramsFromRequest,
                              Map<String, Object> paramsFromController,
-                             PlumberPipe pipe,
+                             PlumberPagelet pipe,
                              LinkedBlockingQueue<String> pipeRenderResultQueue,
                              ResultReturnedFlag resultReturnedFlag) {
         super(definition, paramsFromRequest, paramsFromController);

@@ -146,17 +146,11 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
                             String controllerViewPath = getViewPath(beanDefinitionName, beanDefinition);
                             PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName, controllerViewPath, clazz);
 
-                        } else if ( PlumberPipe.class.isAssignableFrom(clazz) ) {
+                        } else if ( PlumberPagelet.class.isAssignableFrom(clazz) ) {
 
-                            beanDefinition.setScope("prototype"); // reset PlumberPipe scope
-                            String pipeViewPath = getViewPath(beanDefinitionName, beanDefinition);
-                            PlumberWorkerDefinitionsRepo.pipeRegister(beanDefinitionName, pipeViewPath, clazz);
-
-                        } else if ( PlumberBarrier.class.isAssignableFrom(clazz) ) {
-
-                            beanDefinition.setScope("prototype"); // reset PlumberBarrier scope
-                            String barrierViewPath = getViewPath(beanDefinitionName, beanDefinition);
-                            PlumberWorkerDefinitionsRepo.barrierRegister(beanDefinitionName, barrierViewPath, clazz);
+                            beanDefinition.setScope("prototype"); // reset PlumberPagelet scope
+                            String pageletViewPath = getViewPath(beanDefinitionName, beanDefinition);
+                            PlumberWorkerDefinitionsRepo.pageletRegister(beanDefinitionName, pageletViewPath, clazz);
 
                         } else if ( Plumber.class.isAssignableFrom(clazz) ) {
 

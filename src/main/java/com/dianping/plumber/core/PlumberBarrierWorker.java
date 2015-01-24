@@ -18,14 +18,14 @@ import java.util.concurrent.CountDownLatch;
 public class PlumberBarrierWorker extends PlumberWorker {
 
     private final CountDownLatch latch;
-    private final PlumberBarrier barrier;
+    private final PlumberPagelet barrier;
     private final ConcurrentHashMap<String,String> barrierRenderResults;
 
     public PlumberBarrierWorker(PlumberBarrierDefinition definition,
                                 Map<String, Object> paramsFromRequest,
                                 Map<String, Object> paramsFromController,
                                 CountDownLatch latch,
-                                PlumberBarrier barrier,
+                                PlumberPagelet barrier,
                                 ConcurrentHashMap<String, String> barrierRenderResults) {
         super(definition, paramsFromRequest, paramsFromController);
         this.latch = latch;

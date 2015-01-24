@@ -40,7 +40,7 @@ public class BarrierInterceptor implements Interceptor {
 
             for ( PlumberBarrierDefinition barrierDefinition : barrierDefinitions ) {
                 String barrierName = barrierDefinition.getName();
-                PlumberBarrier barrier = (PlumberBarrier) invocation.getApplicationContext().getBean(barrierName);
+                PlumberPagelet barrier = (PlumberPagelet) invocation.getApplicationContext().getBean(barrierName);
                 injectAnnotationFields(barrier, barrierDefinition, paramsFromRequest, paramsFromController);
                 PlumberBarrierWorker barrierWorker = new PlumberBarrierWorker(barrierDefinition, paramsFromRequest, paramsFromController,
                         barrierLatch, barrier, barrierRenderResults);
@@ -56,7 +56,7 @@ public class BarrierInterceptor implements Interceptor {
         return ResultType.SUCCESS;
     }
 
-    private void injectAnnotationFields(PlumberBarrier barrier,
+    private void injectAnnotationFields(PlumberPagelet barrier,
                                         PlumberBarrierDefinition barrierDefinition,
                                         Map<String, Object> paramsFromRequest,
                                         Map<String, Object> paramsFromController) {
@@ -71,7 +71,7 @@ public class BarrierInterceptor implements Interceptor {
     }
 
     private void injectAnnotationFields(String barrierName,
-                                        PlumberBarrier barrier,
+                                        PlumberPagelet barrier,
                                         List<Field> fields,
                                         Map<String, Object> params) {
 
