@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,6 +34,7 @@ public class InvocationContext {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final LinkedBlockingQueue<String> pipeRenderResultQueue = new LinkedBlockingQueue<String>();
+    private final AtomicInteger currentPipeSeqLocation;
 
     private final ResultReturnedFlag resultReturnedFlag = new ResultReturnedFlag();
     private ResultType resultType;
@@ -46,6 +48,7 @@ public class InvocationContext {
         this.request = request;
         this.response = response;
         this.interceptors = getInterceptors();
+        this.currentPipeSeqLocation = getStartingPipeSeqLocation(controllerName);
     }
 
     public ResultType invoke() throws Exception {
@@ -62,6 +65,16 @@ public class InvocationContext {
         interceptorList.add(new BarrierInterceptor());
         interceptorList.add(new PipeInterceptor());
         return interceptorList.iterator();
+    }
+
+    private AtomicInteger getStartingPipeSeqLocation(String controllerName) {
+        PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(controllerName);
+        Integer startingSeqLocation = controllerDefinition.getStartingSeqLocation();
+        if ( startingSeqLocation!=null ) {
+            return new AtomicInteger(startingSeqLocation);
+        } else {
+            return null;
+        }
     }
 
     public LinkedBlockingQueue<String> getPipeRenderResultQueue() {
@@ -102,5 +115,9 @@ public class InvocationContext {
 
     public ResultReturnedFlag getResultReturnedFlag() {
         return resultReturnedFlag;
+    }
+
+    public AtomicInteger getCurrentPipeSeqLocation() {
+        return currentPipeSeqLocation;
     }
 }

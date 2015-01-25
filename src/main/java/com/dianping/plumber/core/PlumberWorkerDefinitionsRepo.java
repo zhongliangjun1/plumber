@@ -163,7 +163,7 @@ public class PlumberWorkerDefinitionsRepo {
 
                         List<String> pipeNames = ViewParser.recognizePipeNames(viewSource);
                         Boolean hasSequence = null;
-                        Integer seqStartingLocation = null;
+                        Integer startingSeqLocation = null;
                         if ( !CollectionUtils.isEmpty(pipeNames) ) {
                             List<PlumberPipeDefinition> pipeDefinitions = new ArrayList<PlumberPipeDefinition>();
                             for (String pipeName : pipeNames) {
@@ -177,8 +177,8 @@ public class PlumberWorkerDefinitionsRepo {
                                         String[] info = pipeName.split("@");
                                         pipeName = info[0];
                                         pipeSeqLocation = Integer.parseInt(info[1]);
-                                        if ( seqStartingLocation==null || pipeSeqLocation<seqStartingLocation ) {
-                                            seqStartingLocation = pipeSeqLocation;
+                                        if ( startingSeqLocation==null || pipeSeqLocation<startingSeqLocation ) {
+                                            startingSeqLocation = pipeSeqLocation;
                                         }
                                     }
                                 } else {
@@ -197,7 +197,7 @@ public class PlumberWorkerDefinitionsRepo {
                             }
                             controllerDefinition.setPipeNames(pipeNames);
                             controllerDefinition.setPipeDefinitions(pipeDefinitions);
-                            controllerDefinition.setSeqStartingLocation(seqStartingLocation);
+                            controllerDefinition.setStartingSeqLocation(startingSeqLocation);
                         }
 
                         controllerDefinitionsRepo.put(controllerName, controllerDefinition);
