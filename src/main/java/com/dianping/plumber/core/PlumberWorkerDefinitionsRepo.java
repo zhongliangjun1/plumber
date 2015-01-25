@@ -162,16 +162,42 @@ public class PlumberWorkerDefinitionsRepo {
                         }
 
                         List<String> pipeNames = ViewParser.recognizePipeNames(viewSource);
+                        Boolean hasSequence = null;
+                        Integer seqStartingLocation = null;
                         if ( !CollectionUtils.isEmpty(pipeNames) ) {
                             List<PlumberPipeDefinition> pipeDefinitions = new ArrayList<PlumberPipeDefinition>();
                             for (String pipeName : pipeNames) {
+
+                                Integer pipeSeqLocation = null;
+                                if ( pipeName.indexOf("@")>0 ) {
+                                    if ( hasSequence!=null && hasSequence==false ) {
+                                        throw new PlumberInitializeFailureException("inconsistent pipe sequence configuration");
+                                    } else {
+                                        hasSequence = true;
+                                        String[] info = pipeName.split("@");
+                                        pipeName = info[0];
+                                        pipeSeqLocation = Integer.parseInt(info[1]);
+                                        if ( seqStartingLocation==null || pipeSeqLocation<seqStartingLocation ) {
+                                            seqStartingLocation = pipeSeqLocation;
+                                        }
+                                    }
+                                } else {
+                                    if ( hasSequence!=null && hasSequence==true ) {
+                                        throw new PlumberInitializeFailureException("inconsistent pipe sequence configuration");
+                                    } else {
+                                        hasSequence = false;
+                                    }
+                                }
+
                                 PlumberPageletDefinition pageletDefinition = pageletDefinitionsRepo.get(pipeName);
                                 PlumberPipeDefinition pipeDefinition = new PlumberPipeDefinition();
                                 BeanUtils.copyProperties(pageletDefinition, pipeDefinition);
+                                pipeDefinition.setSeqLocation(pipeSeqLocation);
                                 pipeDefinitions.add(pipeDefinition);
                             }
                             controllerDefinition.setPipeNames(pipeNames);
                             controllerDefinition.setPipeDefinitions(pipeDefinitions);
+                            controllerDefinition.setSeqStartingLocation(seqStartingLocation);
                         }
 
                         controllerDefinitionsRepo.put(controllerName, controllerDefinition);

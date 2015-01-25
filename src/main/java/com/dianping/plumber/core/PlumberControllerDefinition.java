@@ -21,6 +21,7 @@ public class PlumberControllerDefinition {
 
     private List<String> pipeNames;
     private List<PlumberPipeDefinition> pipeDefinitions;
+    private Integer seqStartingLocation;
 
     private Class<PlumberController> controllerClass;
     private List<Field> paramFromRequestFields;
@@ -37,6 +38,14 @@ public class PlumberControllerDefinition {
 
     public List<PlumberBarrierDefinition> getBarrierDefinitions() {
         return barrierDefinitions;
+    }
+
+    public Integer getSeqStartingLocation() {
+        return seqStartingLocation;
+    }
+
+    public void setSeqStartingLocation(Integer seqStartingLocation) {
+        this.seqStartingLocation = seqStartingLocation;
     }
 
     public void setBarrierDefinitions(List<PlumberBarrierDefinition> barrierDefinitions) {

@@ -9,4 +9,13 @@ package com.dianping.plumber.core;
  */
 public class PlumberPipeDefinition extends PlumberPageletDefinition {
 
+    private Integer seqLocation;
+
+    public Integer getSeqLocation() {
+        return seqLocation;
+    }
+
+    public void setSeqLocation(Integer seqLocation) {
+        this.seqLocation = seqLocation;
+    }
 }
