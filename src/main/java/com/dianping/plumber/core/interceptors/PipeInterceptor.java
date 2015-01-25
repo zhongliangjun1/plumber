@@ -9,7 +9,9 @@ import org.apache.log4j.Logger;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,13 +35,24 @@ public class PipeInterceptor implements Interceptor {
 
             Map<String, Object> paramsFromRequest = invocation.getParamsFromRequest();
             Map<String, Object> paramsFromController = invocation.getParamsForPagelets();
+            final AtomicInteger currentPipeSeqLocation = invocation.getCurrentPipeSeqLocation();
+            CyclicBarrier cyclicBarrier = null;
+            if ( currentPipeSeqLocation!=null ) {
+                cyclicBarrier = new CyclicBarrier(pipeDefinitions.size(), new Runnable() {
+                    @Override
+                    public void run() {
+                        currentPipeSeqLocation.incrementAndGet();
+                    }
+                });
+            }
+
             for (PlumberPipeDefinition definition : pipeDefinitions) {
                 String name = definition.getName();
                 PlumberPagelet pipe = (PlumberPagelet) invocation.getApplicationContext().getBean(name);
                 injectAnnotationFields(pipe, definition, paramsFromRequest, paramsFromController);
                 LinkedBlockingQueue<String> pipeRenderResultQueue = invocation.getPipeRenderResultQueue();
                 ResultReturnedFlag resultReturnedFlag = invocation.getResultReturnedFlag();
-                PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromRequest, paramsFromController, pipe, pipeRenderResultQueue, resultReturnedFlag);
+                PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromRequest, paramsFromController, pipe, cyclicBarrier, pipeRenderResultQueue, resultReturnedFlag);
                 Executor.getInstance().submit(pipeWorker);
             }
 

@@ -7,6 +7,7 @@ import com.dianping.plumber.view.ViewRenderer;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.util.Map;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -21,16 +22,19 @@ public class PlumberPipeWorker extends PlumberWorker {
 
     private final PlumberPagelet pipe;
     private final LinkedBlockingQueue<String> pipeRenderResultQueue;
+    private CyclicBarrier cyclicBarrier;
     private final ResultReturnedFlag resultReturnedFlag;
 
     public PlumberPipeWorker(PlumberPipeDefinition definition,
                              Map<String, Object> paramsFromRequest,
                              Map<String, Object> paramsFromController,
                              PlumberPagelet pipe,
+                             CyclicBarrier cyclicBarrier,
                              LinkedBlockingQueue<String> pipeRenderResultQueue,
                              ResultReturnedFlag resultReturnedFlag) {
         super(definition, paramsFromRequest, paramsFromController);
         this.pipe = pipe;
+        this.cyclicBarrier = cyclicBarrier;
         this.pipeRenderResultQueue = pipeRenderResultQueue;
         this.resultReturnedFlag = resultReturnedFlag;
     }
