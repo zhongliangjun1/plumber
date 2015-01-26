@@ -33,14 +33,14 @@ public class ViewParser {
         if ( viewSource==null )
             throw new ViewSourceNotFoundException();
 
-        String reg = "\\s*=\\s*[\"\'][A-Za-z]+[\"\']";
+        String reg;
         String placeholder;
         if ( pageComponentEnum==PlumberPageComponentEnum.PlumberBarrier ) {
             placeholder = PlumberConfig.getBarrierViewPlaceHolder();
-            reg = placeholder + reg; // "pb-barrier\\s*=\\s*[\"\'][A-Za-z]+[\"\']";
+            reg = placeholder + "\\s*=\\s*[\"\'][A-Za-z]+[\"\']"; // "pb-barrier\\s*=\\s*[\"\'][A-Za-z]+[\"\']";
         } else {
             placeholder = PlumberConfig.getPipeViewPlaceHolder();
-            reg = placeholder + reg; // "pb-pipe\\s*=\\s*[\"\'][A-Za-z]+[\"\']";
+            reg = placeholder + "\\s*=\\s*[\"\'][A-Za-z]+(@\\d+){0,1}[\"\']"; // "pb-pipe\\s*=\\s*[\"\'][A-Za-z]+[\"\']";
         }
 
         List<String> names = new ArrayList<String>();

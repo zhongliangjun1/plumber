@@ -9,9 +9,11 @@ import org.apache.log4j.Logger;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,15 +37,13 @@ public class PipeInterceptor implements Interceptor {
 
             Map<String, Object> paramsFromRequest = invocation.getParamsFromRequest();
             Map<String, Object> paramsFromController = invocation.getParamsForPagelets();
-            final AtomicInteger currentPipeSeqLocation = invocation.getCurrentPipeSeqLocation();
-            CyclicBarrier cyclicBarrier = null;
+
+            AtomicInteger currentPipeSeqLocation = invocation.getCurrentPipeSeqLocation();
+            Lock flushLock = null;
+            Condition flushCondition = null;
             if ( currentPipeSeqLocation!=null ) {
-                cyclicBarrier = new CyclicBarrier(pipeDefinitions.size(), new Runnable() {
-                    @Override
-                    public void run() {
-                        currentPipeSeqLocation.incrementAndGet();
-                    }
-                });
+                flushLock = new ReentrantLock();
+                flushCondition = flushLock.newCondition();
             }
 
             for (PlumberPipeDefinition definition : pipeDefinitions) {
@@ -52,7 +52,9 @@ public class PipeInterceptor implements Interceptor {
                 injectAnnotationFields(pipe, definition, paramsFromRequest, paramsFromController);
                 LinkedBlockingQueue<String> pipeRenderResultQueue = invocation.getPipeRenderResultQueue();
                 ResultReturnedFlag resultReturnedFlag = invocation.getResultReturnedFlag();
-                PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromRequest, paramsFromController, pipe, cyclicBarrier, pipeRenderResultQueue, resultReturnedFlag);
+                PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromRequest, paramsFromController,
+                        pipe, flushLock, flushCondition, currentPipeSeqLocation,
+                        pipeRenderResultQueue, resultReturnedFlag);
                 Executor.getInstance().submit(pipeWorker);
             }
 

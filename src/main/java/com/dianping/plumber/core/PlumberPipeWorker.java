@@ -7,9 +7,11 @@ import com.dianping.plumber.view.ViewRenderer;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.util.Map;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,19 +24,25 @@ public class PlumberPipeWorker extends PlumberWorker {
 
     private final PlumberPagelet pipe;
     private final LinkedBlockingQueue<String> pipeRenderResultQueue;
-    private CyclicBarrier cyclicBarrier;
+    private final Lock flushLock;
+    private final Condition flushCondition;
+    private final AtomicInteger currentPipeSeqLocation;
     private final ResultReturnedFlag resultReturnedFlag;
 
     public PlumberPipeWorker(PlumberPipeDefinition definition,
                              Map<String, Object> paramsFromRequest,
                              Map<String, Object> paramsFromController,
                              PlumberPagelet pipe,
-                             CyclicBarrier cyclicBarrier,
+                             Lock flushLock,
+                             Condition flushCondition,
+                             AtomicInteger currentPipeSeqLocation,
                              LinkedBlockingQueue<String> pipeRenderResultQueue,
                              ResultReturnedFlag resultReturnedFlag) {
         super(definition, paramsFromRequest, paramsFromController);
         this.pipe = pipe;
-        this.cyclicBarrier = cyclicBarrier;
+        this.flushLock = flushLock;
+        this.flushCondition = flushCondition;
+        this.currentPipeSeqLocation = currentPipeSeqLocation;
         this.pipeRenderResultQueue = pipeRenderResultQueue;
         this.resultReturnedFlag = resultReturnedFlag;
     }
@@ -68,21 +76,59 @@ public class PlumberPipeWorker extends PlumberWorker {
 
         } finally {
 
-            if ( resultReturnedFlag.isReturned() ) {
-                logger.error("can not return the pipe " + definition.getName() + "'s render result", new PlumberPipeTimeoutException());
-                return;
-            }
+            if ( flushLock==null ) {
 
-            try {
-                boolean insertResult = pipeRenderResultQueue.offer(renderResult, PlumberConfig.getResponseTimeout(), TimeUnit.MILLISECONDS);
-                if ( !insertResult ) {
-                    logger.error("can not return the pipe " + definition.getName() + "'s render result", new PlumberPipeTimeoutException());
+                sendBackRenderResult(renderResult);
+
+            } else {
+
+                PlumberPipeDefinition plumberPipeDefinition = (PlumberPipeDefinition) definition;
+                Integer pipeSeqLocation = plumberPipeDefinition.getSeqLocation();
+
+                flushLock.lock();
+                try {
+                    while ( pipeSeqLocation>=currentPipeSeqLocation.get() ) {
+                        if ( pipeSeqLocation==currentPipeSeqLocation.get() ) {
+                            sendBackRenderResult(renderResult);
+                            currentPipeSeqLocation.incrementAndGet();
+                            flushCondition.signalAll();
+                        } else {
+                            try {
+                                flushCondition.await();
+                            } catch (InterruptedException e) {
+                                logger.error("can not return the pipe " + definition.getName() + "'s render result", e);
+                                break;
+                            }
+                        }
+                    }
+                } finally {
+                    flushLock.unlock();
                 }
-            } catch (InterruptedException e) {
-                logger.error("can not return the pipe " + definition.getName() + "'s render result", new PlumberPipeTimeoutException(e));
+
             }
 
         }
     }
+
+    private void sendBackRenderResult(String renderResult) {
+
+        if ( resultReturnedFlag.isReturned() ) {
+            logger.error("can not return the pipe " + definition.getName() + "'s render result", new PlumberPipeTimeoutException());
+            return;
+        }
+
+        try {
+            boolean insertResult = pipeRenderResultQueue.offer(renderResult, PlumberConfig.getResponseTimeout(), TimeUnit.MILLISECONDS);
+            if ( !insertResult ) {
+                logger.error("can not return the pipe " + definition.getName() + "'s render result", new PlumberPipeTimeoutException());
+            }
+        } catch (InterruptedException e) {
+            logger.error("can not return the pipe " + definition.getName() + "'s render result", new PlumberPipeTimeoutException(e));
+        }
+
+    }
+
+
+
 
 }
