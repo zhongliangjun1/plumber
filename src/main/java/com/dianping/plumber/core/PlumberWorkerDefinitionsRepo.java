@@ -11,10 +11,7 @@ import com.dianping.plumber.view.*;
 import org.springframework.beans.BeanUtils;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -162,9 +159,9 @@ public class PlumberWorkerDefinitionsRepo {
                         }
 
                         List<String> pipeNames = ViewParser.recognizePipeNames(viewSource);
-                        Boolean hasSequence = null;
-                        Integer startingSeqLocation = null;
                         if ( !CollectionUtils.isEmpty(pipeNames) ) {
+                            Boolean hasSequence = null;
+                            List<Integer> seqLocations = new ArrayList<Integer>();
                             List<PlumberPipeDefinition> pipeDefinitions = new ArrayList<PlumberPipeDefinition>();
                             for (String pipeName : pipeNames) {
 
@@ -177,9 +174,7 @@ public class PlumberWorkerDefinitionsRepo {
                                         String[] info = pipeName.split("@");
                                         pipeName = info[0];
                                         pipeSeqLocation = Integer.parseInt(info[1]);
-                                        if ( startingSeqLocation==null || pipeSeqLocation<startingSeqLocation ) {
-                                            startingSeqLocation = pipeSeqLocation;
-                                        }
+                                        seqLocations.add(pipeSeqLocation);
                                     }
                                 } else {
                                     if ( hasSequence!=null && hasSequence==true ) {
@@ -197,7 +192,11 @@ public class PlumberWorkerDefinitionsRepo {
                             }
                             controllerDefinition.setPipeNames(pipeNames);
                             controllerDefinition.setPipeDefinitions(pipeDefinitions);
-                            controllerDefinition.setStartingSeqLocation(startingSeqLocation);
+                            if ( hasSequence ) {
+                                Collections.sort(seqLocations);
+                                checkPipeSeqLocations(seqLocations);
+                                controllerDefinition.setStartingSeqLocation(seqLocations.get(0));
+                            }
                         }
 
                         controllerDefinitionsRepo.put(controllerName, controllerDefinition);
@@ -239,6 +238,15 @@ public class PlumberWorkerDefinitionsRepo {
         result.put(ParamFromRequest.class, paramFromRequestFields);
         result.put(ParamFromController.class, paramFromControllerFields);
         return result;
+    }
+
+    private static void checkPipeSeqLocations(List<Integer> seqLocations) {
+        for (int i = 1; i < seqLocations.size(); i++) {
+            Integer cur = seqLocations.get(i);
+            Integer pre = seqLocations.get(i-1);
+            if ( cur-pre!=1 )
+                throw new PlumberInitializeFailureException("Pipe's order should be one by one and could not be skipped!");
+        }
     }
 
     public static PlumberControllerDefinition getPlumberControllerDefinition(String controllerName) {
