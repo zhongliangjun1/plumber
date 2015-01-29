@@ -23,8 +23,13 @@ public abstract class ResponseUtils {
             writer.print(renderResult);
             response.flushBuffer();
         } catch (IOException e) {
+            /**
+             * This occures due to client disconnection. There could be several reason for that like timeout,
+             * internet connection broken, browser closed, server refused to accept request because of load etc.
+             * In 99% case this exception should be ignored.
+             */
             String msg = "response flush buffer with some IO problem";
-            logger.error(msg,e);
+            logger.warn(msg,e);
         }
     }
 
