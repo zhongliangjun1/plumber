@@ -411,6 +411,48 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 **@ParamFromRequest** 可以在 **controller** **barrier** 和 **pipe** 中使用， 而 **@ParamFromController** 则只可以在 **barrier** 和 **pipe** 中使用。
 
+###3) 移动 H5 页面 SEO 优化
+
+在前面我们已经指出 **pipe** 类型的 pagelet 作为后续输出返回到 client 时， 我们需要把它插入到页面我们想要的位置，所以会将 **pipe** 的 dom 包在一段 javascript 中，通过 javascript append 到预期的位置，当然这种方式或多或少会对我们的页面 seo 产生一些影响。
+
+不过对于移动 H5 页面，它的 dom 结构天然的具有“顺序性”，而且尤其适合于 **big-pipe**, 因为我们确实可以优先只显示首屏的内容，首屏往下的其余部分，我们都可以通过 **big-pipe** 后续返回。
+
+而如果对后续返回的这些 **pagelet**，我们可以施加一定的顺序控制，如下面的 mobileFirstPipe mobileSecondPipe mobileThirdPipe 和 mobileFourthPipe （ mobileSecondPipe 会等 mobileFirstPipe 返回后再返回，而不会等待 mobileThirdPipe 或 mobileFourthPipe；同样 mobileThirdPipe 会等 mobileFirstPipe 和 mobileSecondPipe 返回后再返回，而不会等 mobileFourthPipe ）。
+
+	<html>
+
+    ...
+
+    <div class="header" pb-barrier="mobileHeadBarrier">
+        ${mobileHeadBarrier}
+    </div>
+
+    <div class="bs-callout bs-callout-orange item" pb-barrier="mobileMainBarrier">
+        ${mobileMainBarrier}
+    </div>
+
+    <script src="/static/common/js/jquery.min.js"></script>
+    <script src="/static/common/js/bootstrap.min.js"></script>
+
+    <div class="hide" pb-pipe="mobileFirstPipe"></div>
+    <div class="hide" pb-pipe="mobileSecondPipe"></div>
+    <div class="hide" pb-pipe="mobileThirdPipe"></div>
+    <div class="hide" pb-pipe="mobileFourthPipe"></div>
+
+    <#--</body>-->
+	<#--</html>-->
+
+现在在 **plumber** 中要实现这样的效果非常简单，你只需要在指定 **pb-pipe** name 的同时，向下面这样指定它的优先级即可：
+
+	<div class="hide" pb-pipe="mobileFirstPipe@1"></div>
+    <div class="hide" pb-pipe="mobileSecondPipe@2"></div>
+    <div class="hide" pb-pipe="mobileThirdPipe@3"></div>
+    <div class="hide" pb-pipe="mobileFourthPipe@4"></div>
+    
+**@** 后面指定的优先级就如同优先级队列中的下标，从1开始，依次往后。指定 **pagelet** 的优先级之后，**plumber** 便会按照你指定的顺序来返回这些 **pagelet** 。
+
+需要注意的是，优先级数字顺序不可以跳过，指定优先级顺序后，不可以存在某些 **pipe** 类型的 **pagelet** 不指定优先级。
+
 
 
 ##Change Log
