@@ -410,3 +410,16 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 打过注解的成员变量，**plumber** 将以你的参数名为 key , 自动到相应的 Map 中去获取对应的 value ，帮你做类型转换，然后注入进来。 
 
 **@ParamFromRequest** 可以在 **controller** **barrier** 和 **pipe** 中使用， 而 **@ParamFromController** 则只可以在 **barrier** 和 **pipe** 中使用。
+
+
+
+##Change Log
+
+####1.3.1-SNAPSHOT
+* 解决了原来在 **PlumberController** 中注入的 **paramsForPagelets** 及 **modelForView** 为 ConcurrentHashMap 类型， 当用户向其 put 的 value 值为 **null** 时会报出 NPE 的问题( [Why does ConcurrentHashMap prevent null keys and values?](http://stackoverflow.com/questions/698638/why-does-concurrenthashmap-prevent-null-keys-and-values) ) 。
+
+
+
+
+
+
