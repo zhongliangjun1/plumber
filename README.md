@@ -442,7 +442,7 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
     <#--</body>-->
 	<#--</html>-->
 
-现在在 **plumber** 中要实现这样的效果非常简单，你只需要在指定 **pb-pipe** name 的同时，向下面这样指定它的优先级即可：
+现在在 **plumber** 中要实现这样的效果非常简单，你只需要在指定 **pb-pipe** name 的同时，像下面这样指定它的优先级即可：
 
 	<div class="hide" pb-pipe="mobileFirstPipe@1"></div>
     <div class="hide" pb-pipe="mobileSecondPipe@2"></div>
@@ -451,7 +451,7 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
     
 **@** 后面指定的优先级就如同优先级队列中的下标，从1开始，依次往后。指定 **pagelet** 的优先级之后，**plumber** 便会按照你指定的顺序来返回这些 **pagelet** 。
 
-需要注意的是，优先级数字顺序不可以跳过，指定优先级顺序后，不可以存在某些 **pipe** 类型的 **pagelet** 不指定优先级。
+需要注意的是，优先级数字顺序不可以跳过；采取指定优先级的方式后，不可以存在部分 **pipe** 类型的 **pagelet** 不指定优先级。
 
 
 
