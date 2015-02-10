@@ -5,6 +5,7 @@ import com.dianping.plumber.core.*;
 import com.dianping.plumber.exception.PlumberControllerNotFoundException;
 import com.dianping.plumber.exception.PlumberRuntimeException;
 import com.dianping.plumber.utils.CollectionUtils;
+import com.dianping.plumber.utils.MapUtils;
 import com.dianping.plumber.utils.ResponseUtils;
 import com.dianping.plumber.view.ViewRenderer;
 import org.apache.log4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,12 +38,14 @@ public class ControllerInterceptor implements Interceptor {
         PlumberController controller = getController(invocation);
 
         Map<String, Object> paramsForController = invocation.getParamsForController();
-        ConcurrentHashMap<String, Object> modelForControllerView = invocation.getModelForControllerView();
-        ConcurrentHashMap<String, Object> paramsForPagelets = invocation.getParamsForPagelets();
+        Map<String, Object> tempParamsForPagelets = new HashMap<String, Object>();
+        Map<String, Object> tempModelForControllerView = new HashMap<String, Object>();
 
-        ResultType resultType = controller.execute(paramsForController, paramsForPagelets, modelForControllerView);
+        ResultType resultType = controller.execute(paramsForController, tempParamsForPagelets, tempModelForControllerView);
         if ( resultType!=ResultType.SUCCESS )
             return resultType;
+
+        concurrentProtection(invocation, paramsForController, tempParamsForPagelets, tempModelForControllerView);
 
         resultType = invocation.invoke();
         if ( resultType!=ResultType.SUCCESS )
@@ -50,7 +54,7 @@ public class ControllerInterceptor implements Interceptor {
         PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(controllerName);
         String viewSource = controllerDefinition.getViewSource();
         ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
-        String renderResult = viewRenderer.render(controllerName, viewSource, modelForControllerView);
+        String renderResult = viewRenderer.render(controllerName, viewSource, invocation.getModelForControllerView());
 
         HttpServletResponse response = invocation.getResponse();
         ResponseUtils.flushBuffer(response, renderResult);
@@ -116,6 +120,17 @@ public class ControllerInterceptor implements Interceptor {
                 }
             }
         }
+
+    }
+
+    private void concurrentProtection(InvocationContext invocation,
+                                      Map<String, Object> paramsForController,
+                                      Map<String, Object> tempParamsForPagelets,
+                                      Map<String, Object> tempModelForControllerView) {
+
+        MapUtils.convert(paramsForController, invocation.getParamsFromRequest());
+        MapUtils.convert(tempParamsForPagelets, invocation.getParamsForPagelets());
+        MapUtils.convert(tempModelForControllerView, invocation.getModelForControllerView());
 
     }
 

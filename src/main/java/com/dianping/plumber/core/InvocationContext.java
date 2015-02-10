@@ -28,6 +28,7 @@ public class InvocationContext {
     private final String controllerName;
     private final Map<String, Object> paramsForController;
     private final ConcurrentHashMap<String, Object> modelForControllerView = new ConcurrentHashMap<String, Object>();
+    private final ConcurrentHashMap<String, Object> paramsFromRequest = new ConcurrentHashMap<String, Object>();
     private final ConcurrentHashMap<String, Object> paramsForPagelets = new ConcurrentHashMap<String, Object>();
     private final Iterator<Interceptor> interceptors;
     private final ApplicationContext applicationContext;
@@ -93,12 +94,12 @@ public class InvocationContext {
         return paramsForController;
     }
 
-    public Map<String, Object> getParamsFromRequest() {
-        return paramsForController;
-    }
-
     public ConcurrentHashMap<String, Object> getModelForControllerView() {
         return modelForControllerView;
+    }
+
+    public ConcurrentHashMap<String, Object> getParamsFromRequest() {
+        return paramsFromRequest;
     }
 
     public ConcurrentHashMap<String, Object> getParamsForPagelets() {
