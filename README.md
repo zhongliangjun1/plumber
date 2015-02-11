@@ -417,7 +417,7 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 不过对于移动 H5 页面，它的 dom 结构天然的具有“顺序性”，而且尤其适合于 **big-pipe**, 因为我们确实可以优先只显示首屏的内容，首屏往下的其余部分，我们都可以通过 **big-pipe** 后续返回。
 
-而如果对后续返回的这些 **pagelet**，我们可以施加一定的顺序控制，如下面的 mobileFirstPipe mobileSecondPipe mobileThirdPipe 和 mobileFourthPipe （ mobileSecondPipe 会等 mobileFirstPipe 返回后再返回，而不会等待 mobileThirdPipe 或 mobileFourthPipe；同样 mobileThirdPipe 会等 mobileFirstPipe 和 mobileSecondPipe 返回后再返回，而不会等 mobileFourthPipe ）。
+而如果对后续返回的这些 **pagelet**，我们可以施加一定的顺序控制，如下面的 mobileFirstPipe mobileSecondPipe mobileThirdPipe 和 mobileFourthPipe （ mobileSecondPipe 会等 mobileFirstPipe 返回后再返回，而不会等待 mobileThirdPipe 或 mobileFourthPipe；同样 mobileThirdPipe 会等 mobileFirstPipe 和 mobileSecondPipe 返回后再返回，而不会等 mobileFourthPipe ），这样我们便不再需要通过 javascript 来控制这些 **pagelet** 的显示位置了，他们会按照你设定的优先级顺序，依次拼接在首次返回的 dom 后面，最终构成完整的 dom tree。
 
 	<html>
 
