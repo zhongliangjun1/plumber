@@ -221,7 +221,7 @@ public class PlumberWorkerDefinitionsRepo {
     }
 
     private static List<String> getBarrierNames(String controllerName, String viewSource) {
-        List<String> barrierNames = new ArrayList<String>();
+        Set<String> barrierNames = new HashSet<String>();
 
         List<String> barrierNamesInViewSource = ViewParser.recognizeBarrierNames(viewSource);
         if ( !CollectionUtils.isEmpty(barrierNamesInViewSource) )
@@ -231,11 +231,11 @@ public class PlumberWorkerDefinitionsRepo {
         if ( !CollectionUtils.isEmpty(barrierNamesInSpringBeanConfig) )
             barrierNames.addAll(barrierNamesInSpringBeanConfig);
 
-        return barrierNames;
+        return new ArrayList<String>(barrierNames);
     }
 
     private static List<String> getPipeNames(String controllerName, String viewSource) {
-        List<String> pipeNames = new ArrayList<String>();
+        Set<String> pipeNames = new HashSet<String>();
 
         List<String> pipeNamesInViewSource = ViewParser.recognizePipeNames(viewSource);
         if ( !CollectionUtils.isEmpty(pipeNamesInViewSource) )
@@ -245,7 +245,7 @@ public class PlumberWorkerDefinitionsRepo {
         if ( !CollectionUtils.isEmpty(pipeNamesInSpringBeanConfig) )
             pipeNames.addAll(pipeNamesInSpringBeanConfig);
 
-        return pipeNames;
+        return new ArrayList<String>(pipeNames);
     }
 
 
