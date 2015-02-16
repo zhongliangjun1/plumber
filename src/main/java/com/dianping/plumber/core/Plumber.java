@@ -68,6 +68,8 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
 
         setResponseContentType(response);
 
+        disableNginxProxyBuffering(response);
+
     }
 
     private void setResponseContentType(HttpServletResponse response) {
@@ -88,9 +90,14 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
         }
     }
 
-
-
-
+    /**
+     * When buffering is disabled, the response is passed to a client synchronously,
+     * immediately as it is received. Nginx will not try to read the whole response from the proxied server.
+     * To learn more : http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering
+     */
+    private void disableNginxProxyBuffering(HttpServletResponse response) {
+        response.setHeader("X-Accel-Buffering", "no");
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
