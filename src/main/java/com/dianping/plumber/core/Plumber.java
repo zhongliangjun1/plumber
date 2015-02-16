@@ -5,6 +5,7 @@ import com.dianping.plumber.config.PlumberConfigOverrider;
 import com.dianping.plumber.config.PlumberConfigOverriderFactory;
 import com.dianping.plumber.exception.PlumberInitializeFailureException;
 import com.dianping.plumber.exception.PlumberRuntimeException;
+import com.dianping.plumber.utils.CollectionUtils;
 import com.dianping.plumber.utils.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -19,6 +20,7 @@ import org.springframework.context.ApplicationContextAware;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -68,7 +70,7 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
 
         setResponseContentType(response);
 
-        disableNginxProxyBuffering(response);
+        disableNginxProxyBuffering(plumberControllerName, response);
 
     }
 
@@ -95,8 +97,14 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
      * immediately as it is received. Nginx will not try to read the whole response from the proxied server.
      * To learn more : http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering
      */
-    private void disableNginxProxyBuffering(HttpServletResponse response) {
-        response.setHeader("X-Accel-Buffering", "no");
+    private void disableNginxProxyBuffering(String plumberControllerName, HttpServletResponse response) {
+
+        PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(plumberControllerName);
+        List<PlumberPipeDefinition> pipeDefinitions = controllerDefinition.getPipeDefinitions();
+
+        if ( !CollectionUtils.isEmpty(pipeDefinitions) ) { // only when having pagelet of pipe type
+            response.setHeader("X-Accel-Buffering", "no");
+        }
     }
 
     @Override
