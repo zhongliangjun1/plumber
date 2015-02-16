@@ -25,6 +25,9 @@ public class PlumberWorkerDefinitionsRepo {
     private final static List<String> controllerNames = new ArrayList<String>();
     private final static List<String> pageletNames = new ArrayList<String>();
 
+    private final static Map<String, List<String>> controllerBarrierNamesInSpringBeanConfigRepo = new HashMap<String, List<String>>();
+    private final static Map<String, List<String>> controllerPipeNamesInSpringBeanConfigRepo = new HashMap<String, List<String>>();
+
     private final static Map<String, String> controllerViewPathsRepo = new HashMap<String, String>();
     private final static Map<String, String> pageletViewPathsRepo = new HashMap<String, String>();
 
@@ -53,7 +56,8 @@ public class PlumberWorkerDefinitionsRepo {
         }
     }
 
-    public static void controllerRegister(String controllerName, String viewPath, Class<PlumberController> controllerClass) {
+    public static void controllerRegister(String controllerName, String viewPath, Class<PlumberController> controllerClass,
+                                          List<String> barrierNamesInSpringBeanConfig, List<String> pipeNamesInSpringBeanConfig) {
         if ( !controllerNames.contains(controllerName) ) {
             controllerNames.add(controllerName);
         }
@@ -68,6 +72,14 @@ public class PlumberWorkerDefinitionsRepo {
             controllerClassesRepo.put(controllerName, controllerClass);
         } else {
             throw new PlumberInitializeFailureException("controller " + controllerName + " can not find valid controllerClass");
+        }
+
+        if ( !CollectionUtils.isEmpty(barrierNamesInSpringBeanConfig) ) {
+            controllerBarrierNamesInSpringBeanConfigRepo.put(controllerName, barrierNamesInSpringBeanConfig);
+        }
+
+        if ( !CollectionUtils.isEmpty(pipeNamesInSpringBeanConfig) ) {
+            controllerPipeNamesInSpringBeanConfigRepo.put(controllerName, pipeNamesInSpringBeanConfig);
         }
     }
 
@@ -145,7 +157,7 @@ public class PlumberWorkerDefinitionsRepo {
                         Map<Class,List<Field>> fieldsMap = getParamAnnotationFields(controllerClass);
                         controllerDefinition.setParamFromRequestFields(fieldsMap.get(ParamFromRequest.class));
 
-                        List<String> barrierNames = ViewParser.recognizeBarrierNames(viewSource);
+                        List<String> barrierNames = getBarrierNames(controllerName, viewSource);
                         if ( !CollectionUtils.isEmpty(barrierNames) ) {
                             List<PlumberBarrierDefinition> barrierDefinitions = new ArrayList<PlumberBarrierDefinition>();
                             for (String barrierName : barrierNames) {
@@ -158,7 +170,7 @@ public class PlumberWorkerDefinitionsRepo {
                             controllerDefinition.setBarrierDefinitions(barrierDefinitions);
                         }
 
-                        List<String> pipeNames = ViewParser.recognizePipeNames(viewSource);
+                        List<String> pipeNames = getPipeNames(controllerName, viewSource);
                         if ( !CollectionUtils.isEmpty(pipeNames) ) {
                             Boolean hasSequence = null;
                             List<Integer> seqLocations = new ArrayList<Integer>();
@@ -207,6 +219,35 @@ public class PlumberWorkerDefinitionsRepo {
             throw new PlumberInitializeFailureException("prepare controllerDefinitions failure", e);
         }
     }
+
+    private static List<String> getBarrierNames(String controllerName, String viewSource) {
+        List<String> barrierNames = new ArrayList<String>();
+
+        List<String> barrierNamesInViewSource = ViewParser.recognizeBarrierNames(viewSource);
+        if ( !CollectionUtils.isEmpty(barrierNamesInViewSource) )
+            barrierNames.addAll(barrierNamesInViewSource);
+
+        List<String> barrierNamesInSpringBeanConfig = controllerBarrierNamesInSpringBeanConfigRepo.get(controllerName);
+        if ( !CollectionUtils.isEmpty(barrierNamesInSpringBeanConfig) )
+            barrierNames.addAll(barrierNamesInSpringBeanConfig);
+
+        return barrierNames;
+    }
+
+    private static List<String> getPipeNames(String controllerName, String viewSource) {
+        List<String> pipeNames = new ArrayList<String>();
+
+        List<String> pipeNamesInViewSource = ViewParser.recognizePipeNames(viewSource);
+        if ( !CollectionUtils.isEmpty(pipeNamesInViewSource) )
+            pipeNames.addAll(pipeNamesInViewSource);
+
+        List<String> pipeNamesInSpringBeanConfig = controllerPipeNamesInSpringBeanConfigRepo.get(controllerName);
+        if ( !CollectionUtils.isEmpty(pipeNamesInSpringBeanConfig) )
+            pipeNames.addAll(pipeNamesInSpringBeanConfig);
+
+        return pipeNames;
+    }
+
 
     private static Map<Class,List<Field>> getParamAnnotationFields(Class clazz) {
 

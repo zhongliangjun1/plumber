@@ -15,11 +15,13 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.TypedStringValue;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -159,7 +161,10 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
 
                             beanDefinition.setScope("prototype"); // reset PlumberController scope
                             String controllerViewPath = getViewPath(beanDefinitionName, beanDefinition);
-                            PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName, controllerViewPath, clazz);
+                            List<String> barrierNamesInSpringBeanConfig = getBarrierNames(beanDefinition);
+                            List<String> pipeNamesInSpringBeanConfig = getPipeNames(beanDefinition);
+                            PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName, controllerViewPath, clazz,
+                                    barrierNamesInSpringBeanConfig, pipeNamesInSpringBeanConfig);
 
                         } else if ( PlumberPagelet.class.isAssignableFrom(clazz) ) {
 
@@ -211,6 +216,33 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
 
         return viewPath;
     }
+
+    private static List<String> getBarrierNames(BeanDefinition beanDefinition) {
+        return getPageletNames("barrierNames", beanDefinition);
+    }
+
+    private static List<String> getPipeNames(BeanDefinition beanDefinition) {
+        return getPageletNames("pipeNames", beanDefinition);
+    }
+
+    private static List<String> getPageletNames(String propertyName, BeanDefinition beanDefinition) {
+        List<String> names = new ArrayList<String>();
+
+        MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+        PropertyValue propertyValue = propertyValues.getPropertyValue(propertyName);
+        if ( propertyValue!=null ) {
+            ManagedList<TypedStringValue> managedList = (ManagedList<TypedStringValue>) propertyValue.getValue();
+            if ( !CollectionUtils.isEmpty(managedList) ) {
+                for (TypedStringValue typedStringValue : managedList) {
+                    names.add(typedStringValue.getValue());
+                }
+            }
+        }
+
+        return names;
+    }
+
+
 
 
 }

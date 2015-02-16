@@ -1,5 +1,6 @@
 package com.dianping.plumber.core;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,6 +13,8 @@ import java.util.Map;
 public abstract class PlumberController {
 
     protected String viewPath;
+    protected List<String> barrierNames;
+    protected List<String> pipeNames;
 
     /**
      * entrance of request. Controller should prepare common params for its pagelets ,
@@ -31,5 +34,21 @@ public abstract class PlumberController {
 
     public void setViewPath(String viewPath) {
         this.viewPath = viewPath;
+    }
+
+    public List<String> getBarrierNames() {
+        return barrierNames;
+    }
+
+    public void setBarrierNames(List<String> barrierNames) {
+        this.barrierNames = barrierNames;
+    }
+
+    public List<String> getPipeNames() {
+        return pipeNames;
+    }
+
+    public void setPipeNames(List<String> pipeNames) {
+        this.pipeNames = pipeNames;
     }
 }
