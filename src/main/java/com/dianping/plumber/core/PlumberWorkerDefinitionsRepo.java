@@ -3,7 +3,6 @@ package com.dianping.plumber.core;
 import com.dianping.plumber.annotation.ParamFromController;
 import com.dianping.plumber.annotation.ParamFromRequest;
 import com.dianping.plumber.config.PlumberConfig;
-import com.dianping.plumber.exception.PlumberControllerNotFoundException;
 import com.dianping.plumber.exception.PlumberInitializeFailureException;
 import com.dianping.plumber.utils.CollectionUtils;
 import com.dianping.plumber.utils.StringUtils;
@@ -306,10 +305,10 @@ public class PlumberWorkerDefinitionsRepo {
 
     public static PlumberControllerDefinition getPlumberControllerDefinition(String controllerName) {
         if ( StringUtils.isEmpty(controllerName) )
-            throw new PlumberControllerNotFoundException("illegal controllerName : "+controllerName);
+            throw new PlumberInitializeFailureException("illegal controllerName : "+controllerName);
         PlumberControllerDefinition definition = controllerDefinitionsRepo.get(controllerName);
         if ( definition==null )
-            throw new PlumberControllerNotFoundException("can not find ControllerDefinition of "+controllerName+" in controllerDefinitionsRepo");
+            throw new PlumberInitializeFailureException("can not find ControllerDefinition of "+controllerName+" in controllerDefinitionsRepo");
         return definition;
     }
 

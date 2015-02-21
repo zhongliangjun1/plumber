@@ -7,7 +7,8 @@ package com.dianping.plumber.exception;
  * Time: PM10:57
  * To change this template use File | Settings | File Templates.
  */
-public class ViewSourceNotFoundException extends RuntimeException {
+public class ViewSourceNotFoundException extends PlumberInitializeFailureException {
+
     private static final long serialVersionUID = 9054729895497097919L;
 
     public ViewSourceNotFoundException() {

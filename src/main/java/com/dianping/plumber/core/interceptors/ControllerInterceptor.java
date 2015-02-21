@@ -2,7 +2,6 @@ package com.dianping.plumber.core.interceptors;
 
 import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.core.*;
-import com.dianping.plumber.exception.PlumberControllerNotFoundException;
 import com.dianping.plumber.exception.PlumberRuntimeException;
 import com.dianping.plumber.utils.CollectionUtils;
 import com.dianping.plumber.utils.MapUtils;
@@ -16,7 +15,6 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -90,7 +88,7 @@ public class ControllerInterceptor implements Interceptor {
         ApplicationContext applicationContext = invocation.getApplicationContext();
         PlumberController controller = (PlumberController) applicationContext.getBean(controllerName);
         if ( controller==null ) {
-            throw new PlumberControllerNotFoundException("can not find your plumberController : "+controllerName+" in spring applicationContext");
+            throw new PlumberRuntimeException("can not find your plumberController : "+controllerName+" in spring applicationContext");
         }
 
         PlumberControllerDefinition definition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(controllerName);
