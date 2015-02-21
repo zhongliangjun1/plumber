@@ -32,7 +32,7 @@
 	<dependency>
 	  <groupId>com.dianping</groupId>
 	  <artifactId>plumber</artifactId>
-	  <version>1.3.1-SNAPSHOT</version>
+	  <version>1.4.0</version>
 	</dependency>
 	
 ###2) 添加 plumber.yaml 配置
@@ -292,7 +292,9 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 	configOverriderFactory: com.dianping.plumber.DemoConfigOverriderFactory
 	env: dev
-	responseContentType: text/html;charset=UTF-8
+	response:
+    	contentType: text/html;charset=UTF-8
+    	timeout: 3000
 	view:
 	    encoding: UTF-8
 	    viewSourceLoaderFactory: com.dianping.plumber.view.support.loader.ViewSourceUnderWebContextLoaderFactory
@@ -311,13 +313,15 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 * **env** 配置为 dev 环境时（ 默认为 product ），**plumber** 会直接将抛出异常的 pagelet 的错误堆栈信息作为模块内容输出到页面上，便于查看出错信息，配置为 product 时，**plumber** 将丢弃该 pagelet ，仅输出页面其余 pagelet 内容。你可以通过 **configOverriderFactory** 确保生产环境对该配置的覆盖，避免 dev/product 频繁切换造成疏漏。
 
-* **responseContentType** 设置 response 的 Content-Type。
+* **response.contentType** 设置 response 的 Content-Type。
 
-* **encoding** 页面模板文件的编码方式。
+* **response.timeout** 设置整个页面的响应超时时间，超过这个时间的 **pipe** 类型的 pagelet 将被丢弃。
 
-* **viewSourceLoaderFactory** 页面模板文件 loader 的工厂类。 **plumber** 提供了从 classpath 和 WEB-INF 下加载页面模板文件的两种默认实现： ViewSourceUnderClassPathLoaderFactory 和 ViewSourceUnderWebContextLoaderFactory。需要注意的是，使用 ViewSourceUnderWebContextLoaderFactory 时需要在 web.xml 中将 ViewSourceUnderWebContextLoader 添加为 listener ，且须在 spring 的 ContextLoaderListener 之前。
+* **view.encoding** 页面模板文件的编码方式。
 
-* **viewRendererFactory** 页面模板引擎的工厂类。 **plumber** 默认提供了对 freemarker 引擎的支持：FreemarkerRendererFactory ，当然你也可以使用任意其他模板引擎，提供一个 ViewRendererFactory 的实现即可。
+* **view.viewSourceLoaderFactory** 页面模板文件 loader 的工厂类。 **plumber** 提供了从 classpath 和 WEB-INF 下加载页面模板文件的两种默认实现： ViewSourceUnderClassPathLoaderFactory 和 ViewSourceUnderWebContextLoaderFactory。需要注意的是，使用 ViewSourceUnderWebContextLoaderFactory 时需要在 web.xml 中将 ViewSourceUnderWebContextLoader 添加为 listener ，且须在 spring 的 ContextLoaderListener 之前。
+
+* **view.viewRendererFactory** 页面模板引擎的工厂类。 **plumber** 默认提供了对 freemarker 引擎的支持：FreemarkerRendererFactory ，当然你也可以使用任意其他模板引擎，提供一个 ViewRendererFactory 的实现即可。
 
 * **concurrent** plumber 线程池的相关配置，你可以根据自己的业务特性做相应调整。
 
