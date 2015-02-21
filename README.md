@@ -492,4 +492,6 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 * [Feature] 基类 **PlumberController** 中新增了 **barrierNames** 和 **pipeNames** 这两个成员变量，运行时框架会帮你自动注入，现在可以在 controller 的实例中获取 pagelet 的相关信息了。需要注意的是，它们是上述两种配置方式合并后的结果。
 
+* [Change] 重构 **plumber** 内部异常体系，以 **PlumberInitializeFailureException** 和 **PlumberRuntimeException** 为基础建立异常树。
+
 
