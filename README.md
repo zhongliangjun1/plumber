@@ -322,7 +322,7 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 * **concurrent** plumber 线程池的相关配置，你可以根据自己的业务特性做相应调整。
 
 
-###2) 注解使用 @ParamFromRequest @ParamFromController
+###2) 通过注解进行参数注入： @ParamFromRequest @ParamFromController
 
 在 **plumber** 的 **controller** 中你可以获取从 struts/spring mvc 等 web 框架转发来的请求参数( **Map<String, Object> paramsFromRequest** )，同时也可以在 **Map<String, Object> paramsForPagelets** 中为下一级的 **barrier** 或 **pipe** prepare 一些共用参数：
 
@@ -453,15 +453,43 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 需要注意的是，优先级数字顺序不可以跳过；采取指定优先级的方式后，不可以存在部分 **pipe** 类型的 **pagelet** 不指定优先级。
 
+###4）通过 spring xml 配置 pagelet 信息
+
+除了可以在容器页面中通过 **pb-barrier** 和 **pb-pipe** 这两个页面属性来配置 pagelet 信息外，你也可以在 controller 的 spring xml 中进行配置。如下：
+
+	<bean id="springConfigController" class="com.dianping.plumber.mobile.MobileController">
+    	<property name="viewPath" value="/WEB-INF/view/test/demo.ftl" />
+    	<property name="barrierNames">
+        	<list value-type="java.lang.String">
+            	<value>mobileHeadBarrier</value>
+            	<value>mobileMainBarrier</value>
+        	</list>
+    	</property>
+    	<property name="pipeNames">
+        	<list value-type="java.lang.String">
+            	<value>mobileFirstPipe@1</value>
+            	<value>mobileSecondPipe@2</value>
+            	<value>mobileThirdPipe@3</value>
+            	<value>mobileFourthPipe@4</value>
+        	</list>
+    	</property>
+	</bean>
+	
+如果你在容器页面和 spring xml 中都进行了 pagelet 的相关配置, **plumber** 会合并这两边的配置信息，它们是不冲突的。
 
 
 ##Change Log
 
 ####1.3.1
+
 * 解决了原来在 **PlumberController** 中注入的 **paramsForPagelets** 及 **modelForView** 为 ConcurrentHashMap 类型， 当用户向其 put 的 value 值为 **null** 时会报出 NPE 的问题( [Why does ConcurrentHashMap prevent null keys and values?](http://stackoverflow.com/questions/698638/why-does-concurrenthashmap-prevent-null-keys-and-values) ) 。
 
 * 当页面包含 **pipe** 类型的 pagelet 时，默认关闭 nginx 的 **proxy_buffering** 功能。在使用 nginx 做反向代理时，nginx 默认开启了 **proxy_buffering**，它会将从服务器端接收到的返回数据都丢进 **buffer** 里，最后一起返回，这样服务端的 **pipe** 输出便等同于被 nginx 截流并蓄积起来了，**big-pipe** 的效果也便无法达到了。通过将 **X-Accel-Buffering** 这个 response header 设置为 **no** ,可以关闭 nginx 对该response 的 buffer 操作（ [ngx_http_proxy_module#proxy_buffering](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering) ）。
 
+####1.4.0
 
+* 现在你也可以在 controller 的 spring xml 中配置页面 pagelet 的相关信息，并且它们与在容器页面中通过 **pb-barrier** 和 **pb-pipe** 的配置方式是兼容的。
+
+* 基类 **PlumberController** 中新增了 **barrierNames** 和 **pipeNames** 这两个成员变量，运行时框架会帮你自动注入，现在可以在 controller 的实例中获取 pagelet 的相关信息了。需要注意的是，它们是上述两种配置方式合并后的结果。
 
 
