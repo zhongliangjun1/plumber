@@ -98,6 +98,8 @@ public class ControllerInterceptor implements Interceptor {
         Map<String, Object> paramsForController = invocation.getParamsForController();
         injectAnnotationFields(controllerName, controller, paramFromRequestFields, paramsForController);
 
+        resetFields(controller, definition);
+
         return controller;
     }
 
@@ -121,6 +123,11 @@ public class ControllerInterceptor implements Interceptor {
             }
         }
 
+    }
+
+    private void resetFields(PlumberController controller, PlumberControllerDefinition definition) {
+        controller.setBarrierNames(definition.getBarrierNames());
+        controller.setPipeNames(definition.getPipeNames());
     }
 
     private void concurrentProtection(InvocationContext invocation,

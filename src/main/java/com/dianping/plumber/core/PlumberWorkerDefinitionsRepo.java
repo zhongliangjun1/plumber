@@ -175,6 +175,7 @@ public class PlumberWorkerDefinitionsRepo {
                             Boolean hasSequence = null;
                             List<Integer> seqLocations = new ArrayList<Integer>();
                             List<PlumberPipeDefinition> pipeDefinitions = new ArrayList<PlumberPipeDefinition>();
+                            List<String> cleanPipeNames = new ArrayList<String>();
                             for (String pipeName : pipeNames) {
 
                                 Integer pipeSeqLocation = null;
@@ -201,8 +202,9 @@ public class PlumberWorkerDefinitionsRepo {
                                 BeanUtils.copyProperties(pageletDefinition, pipeDefinition);
                                 pipeDefinition.setSeqLocation(pipeSeqLocation);
                                 pipeDefinitions.add(pipeDefinition);
+                                cleanPipeNames.add(pipeName);
                             }
-                            controllerDefinition.setPipeNames(pipeNames);
+                            controllerDefinition.setPipeNames(cleanPipeNames);
                             controllerDefinition.setPipeDefinitions(pipeDefinitions);
                             if ( hasSequence ) {
                                 Collections.sort(seqLocations);
@@ -220,6 +222,12 @@ public class PlumberWorkerDefinitionsRepo {
         }
     }
 
+    /**
+     * get barrierNames from viewSource and controller bean configuration
+     * @param controllerName
+     * @param viewSource
+     * @return
+     */
     private static List<String> getBarrierNames(String controllerName, String viewSource) {
         Set<String> barrierNames = new HashSet<String>();
 
@@ -234,6 +242,12 @@ public class PlumberWorkerDefinitionsRepo {
         return new ArrayList<String>(barrierNames);
     }
 
+    /**
+     * get pipeNames from viewSource and controller bean configuration
+     * @param controllerName
+     * @param viewSource
+     * @return
+     */
     private static List<String> getPipeNames(String controllerName, String viewSource) {
         Set<String> pipeNames = new HashSet<String>();
 

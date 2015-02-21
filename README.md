@@ -457,10 +457,10 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 ##Change Log
 
-####1.3.1-SNAPSHOT
+####1.3.1
 * 解决了原来在 **PlumberController** 中注入的 **paramsForPagelets** 及 **modelForView** 为 ConcurrentHashMap 类型， 当用户向其 put 的 value 值为 **null** 时会报出 NPE 的问题( [Why does ConcurrentHashMap prevent null keys and values?](http://stackoverflow.com/questions/698638/why-does-concurrenthashmap-prevent-null-keys-and-values) ) 。
 
-* 当页面包含 **pipe** 类型的 pagelet 时，默认关闭 nginx 的 **proxy_buffering** 功能。在使用 nginx 做反向代理时，nginx 默认开启了 **proxy_buffering**，它会将从服务器端接收到的返回数据都丢进 **buffer** 里，最后一起返回，这样服务端的 **pipe** 输出便等同于被 nginx 截流蓄积起来了，**big-pipe** 的效果也便无法达到了。通过将 **X-Accel-Buffering** 这个 response header 设置为 **no** ,可以关闭 nginx 的这项功能（ [ngx_http_proxy_module#proxy_buffering](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering) ）。
+* 当页面包含 **pipe** 类型的 pagelet 时，默认关闭 nginx 的 **proxy_buffering** 功能。在使用 nginx 做反向代理时，nginx 默认开启了 **proxy_buffering**，它会将从服务器端接收到的返回数据都丢进 **buffer** 里，最后一起返回，这样服务端的 **pipe** 输出便等同于被 nginx 截流并蓄积起来了，**big-pipe** 的效果也便无法达到了。通过将 **X-Accel-Buffering** 这个 response header 设置为 **no** ,可以关闭 nginx 对该response 的 buffer 操作（ [ngx_http_proxy_module#proxy_buffering](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering) ）。
 
 
 

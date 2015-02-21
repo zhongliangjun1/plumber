@@ -86,13 +86,13 @@
             <version>1.1.1</version>
         </dependency>
 
-        <!-- for support begin-->
+        <!-- for default support dependency begin-->
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.20</version>
         </dependency>
-        <!-- for support end-->
+        <!-- for default support dependency end-->
 
     </dependencies>
 
