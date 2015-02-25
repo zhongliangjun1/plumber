@@ -481,6 +481,10 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 	
 如果你在容器页面和 spring xml 中都进行了 pagelet 的相关配置, **plumber** 会合并这两边的配置信息，它们是不冲突的。
 
+###5）pipe 类型的 pagelet 中不可修改 response header
+
+因为服务端内容在第一次 flush 到客户端后，resposne header 便不可再被修改（客户端已经读取 response header 了），所以在 **pipe** 类型的 pagelet 中不可再对 response header 进行相关修改操作，如添加、修改 cookie 等。
+
 
 ##Change Log
 
