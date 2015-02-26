@@ -502,4 +502,5 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 * [Change] 重构 **plumber** 内部异常体系，以 **PlumberInitializeFailureException** 和 **PlumberRuntimeException** 为基础建立异常树。
 
+* [Change] 重构代码，重新组织了 core package 内部结构，划分出 **definitions** 和 **workers** 两个 package ，分别对应于 pagelet 的相关定义信息和并发任务 worker 。
 
