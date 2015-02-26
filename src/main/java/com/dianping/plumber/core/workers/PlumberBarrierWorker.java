@@ -1,5 +1,11 @@
-package com.dianping.plumber.core;
+package com.dianping.plumber.core.workers;
 
+import com.dianping.plumber.core.PlumberGlobals;
+import com.dianping.plumber.core.PlumberPagelet;
+import com.dianping.plumber.core.PlumberWorkerDefinitionsRepo;
+import com.dianping.plumber.core.ResultType;
+import com.dianping.plumber.core.definitions.PlumberBarrierDefinition;
+import com.dianping.plumber.core.workers.PlumberWorker;
 import com.dianping.plumber.utils.StringUtils;
 import com.dianping.plumber.view.ViewRenderer;
 import org.apache.commons.lang.exception.ExceptionUtils;

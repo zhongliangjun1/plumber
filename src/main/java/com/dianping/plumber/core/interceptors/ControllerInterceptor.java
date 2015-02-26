@@ -2,6 +2,8 @@ package com.dianping.plumber.core.interceptors;
 
 import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.core.*;
+import com.dianping.plumber.core.definitions.PlumberControllerDefinition;
+import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
 import com.dianping.plumber.exception.PlumberRuntimeException;
 import com.dianping.plumber.utils.CollectionUtils;
 import com.dianping.plumber.utils.MapUtils;

@@ -2,6 +2,9 @@ package com.dianping.plumber.core.interceptors;
 
 import com.dianping.plumber.core.*;
 import com.dianping.plumber.core.concurrent.Executor;
+import com.dianping.plumber.core.definitions.PlumberControllerDefinition;
+import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
+import com.dianping.plumber.core.workers.PlumberPipeWorker;
 import com.dianping.plumber.exception.PlumberRuntimeException;
 import com.dianping.plumber.utils.CollectionUtils;
 import org.apache.log4j.Logger;

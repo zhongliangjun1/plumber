@@ -1,5 +1,6 @@
 package com.dianping.plumber.core;
 
+import com.dianping.plumber.core.definitions.PlumberControllerDefinition;
 import com.dianping.plumber.core.interceptors.BarrierInterceptor;
 import com.dianping.plumber.core.interceptors.ControllerInterceptor;
 import com.dianping.plumber.core.interceptors.Interceptor;

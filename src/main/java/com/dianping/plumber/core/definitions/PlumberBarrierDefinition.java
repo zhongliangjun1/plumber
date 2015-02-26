@@ -1,4 +1,6 @@
-package com.dianping.plumber.core;
+package com.dianping.plumber.core.definitions;
+
+import com.dianping.plumber.core.definitions.PlumberPageletDefinition;
 
 /**
  * Created with IntelliJ IDEA.

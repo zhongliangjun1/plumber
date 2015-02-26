@@ -1,6 +1,9 @@
-package com.dianping.plumber.core;
+package com.dianping.plumber.core.workers;
 
 import com.dianping.plumber.config.PlumberConfig;
+import com.dianping.plumber.core.*;
+import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
+import com.dianping.plumber.core.workers.PlumberWorker;
 import com.dianping.plumber.exception.PlumberPipeTimeoutException;
 import com.dianping.plumber.utils.StringUtils;
 import com.dianping.plumber.view.ViewRenderer;
