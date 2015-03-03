@@ -39,4 +39,45 @@ public abstract class PlumberGlobals {
 
     public static final String CHUNKED_END = "</body></html>";
 
+    public static final String PLUMBER_JS_PLACEHOLDER = "plumberJS";
+
+    public static final String PLUMBER_JS =
+                        "(function(global){\n"+
+            "                var modules = {};\n"+
+            "\n"+
+            "                var ensureModule = function(name){\n"+
+            "                    if(!modules[name]){\n"+
+            "                        modules[name] = {\n"+
+            "                            ready:false,\n"+
+            "                            queue:[]\n"+
+            "                        };\n"+
+            "                    }\n"+
+            "                };\n"+
+            "                var executeModule = function(name){\n"+
+            "                    var queue = modules[name].queue ;\n"+
+            "                    var fn;\n"+
+            "                    while(fn = queue.shift()){\n"+
+            "                        fn.call(this);\n"+
+            "                    }\n"+
+            "                };\n"+
+            "\n"+
+            "                var plumber = {\n"+
+            "                    ready:function(name){\n"+
+            "                        ensureModule(name);\n"+
+            "                        modules[name].ready = true;\n"+
+            "                        executeModule(name);\n"+
+            "                    },\n"+
+            "                    execute:function(name,fn){\n"+
+            "                        ensureModule(name);\n"+
+            "                        modules[name].queue.push(fn);\n"+
+            "                        if(modules[name].ready){\n"+
+            "                            executeModule(name);\n"+
+            "                        }\n"+
+            "                    }\n"+
+            "                };\n"+
+            "\n"+
+            "                global.plumber = plumber;\n"+
+            "\n"+
+            "            })(this);";
+
 }

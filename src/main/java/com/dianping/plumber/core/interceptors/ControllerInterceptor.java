@@ -40,6 +40,7 @@ public class ControllerInterceptor implements Interceptor {
         Map<String, Object> paramsForController = invocation.getParamsForController();
         Map<String, Object> tempParamsForPagelets = new HashMap<String, Object>();
         Map<String, Object> tempModelForControllerView = new HashMap<String, Object>();
+        tempModelForControllerView.put(PlumberGlobals.PLUMBER_JS_PLACEHOLDER, PlumberGlobals.PLUMBER_JS);
 
         ResultType resultType = controller.execute(paramsForController, tempParamsForPagelets, tempModelForControllerView);
         if ( resultType!=ResultType.SUCCESS )
