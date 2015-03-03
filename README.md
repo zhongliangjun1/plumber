@@ -485,6 +485,71 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 因为服务端内容在第一次 flush 到客户端后，resposne header 便不可再被修改（客户端已经读取 header 内容了），所以在 **pipe** 类型的 pagelet 中不可再对 response header 进行相关修改操作，如添加、修改 cookie 等。
 
+###6）plumber.js 不再久久等待 dom ready
+
+将你的静态资源引用作为第一次 **chunked** 输出，可以让你的静态资源提前得到加载，但如果你的 js 需要等待 dom ready 事件，那么你将面临你的 js 在所有 **pipe** 类型的 pagelet 抵达前均无法得到执行。如此所有你提前发送到客户端的 pagelet 将都陷入能看，却没有绑定 js 事件的境地。
+
+事实上属于每个模块的 js 并不一定需要 dom ready 时才可以执行，现在 [**plumber.js**](https://github.com/zhongliangjun1/plumber.js) 可以让你的 js 只要等待所需操作的 dom 节点抵达客户端并被创建并入 dom tree 即可。
+
+	<html>
+
+    <head>
+        <title>${title}</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" href="/static/common/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/static/mobile/css/demo.css">
+        <script type="text/javascript">
+            ${plumberJS}
+        </script>
+    </head>
+
+
+    <body>
+
+    <div class="bs-callout bs-callout-orange item" pb-barrier="jsFirstPagelet">
+        ${jsFirstPagelet}
+    </div>
+
+    <div class="bs-callout bs-callout-grey item" pb-barrier="jsSecondPagelet">
+        ${jsSecondPagelet}
+    </div>
+
+    <script src="/static/common/js/jquery.min.js"></script>
+    <script src="/static/common/js/bootstrap.min.js"></script>
+    <script src="/static/js/demo.js"></script>
+
+    <div class="hide" pb-pipe="jsThirdPagelet@1"></div>
+    <div class="hide" pb-pipe="jsFourthPagelet@2"></div>
+
+    <#--</body>-->
+	<#--</html>-->
+	
+如上，现在你只需在页面的初始，运行 **plumber.js** (框架会自动为你的 **controller** 的 **modelForView** 填充一个名为 **plumberJS** 的变量，它的值即为 **plumber.js** 的具体实现代码)，这个超级轻量的 js lib 为你提供了一个仅仅包含 **ready:function(name)** 和 **execute:function(name,fn)** 这样两个方法的全局 **plumber** 对象。
+
+你的 js 代码现在只需要这样写:
+
+	plumber.execute("jsThirdPagelet" , function(){
+    	console.log($("#jsThirdPagelet").text());
+	});
+	
+在接收到 **jsThirdPagelet** 这个事件（即 **jsThirdPagelet** 这个模块的 dom 抵达客户端并被创建并入 dom tree）之后，callback 函数便会得到执行，它再也不用等待整个页面的 dom ready 事件了。
+
+而在每个页面模块的后面，你只需要加入类似如下这段 js :
+
+	<div class="bs-callout bs-callout-orange item">
+    	<h4 id="jsThirdPagelet" class="bs-callout-title-orange">${title}</h4>
+    	<p>This is the thirdPagelet.</p>
+	</div>
+
+	<script type="text/javascript">
+    	plumber.ready("jsThirdPagelet");
+	</script>
+
+当页面执行到这段 js 的时候，你所需操作的 dom 节点也已经被创建了，**jsThirdPagelet** 事件被触发，你的 callback 函数可以安全地得到执行。
+
+事实上你应该尽可能地让你的 js 不要等到 dom ready 之后才会得以执行，这会严重拖慢你的页面速度：[Don't Let Document Ready Slow You Down](https://alexsexton.com/blog/2010/01/dont-let-document-ready-slow-you-down/)
+
+
 
 ##Change Log
 
@@ -503,4 +568,9 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 * [Change] 重构 **plumber** 内部异常体系，以 **PlumberInitializeFailureException** 和 **PlumberRuntimeException** 为基础建立异常树。
 
 * [Change] 重构代码，重新组织了 core package 内部结构，划分出 **definitions** 和 **workers** 两个 package ，分别对应于 pagelet 的相关定义信息和并发任务 worker 。
+
+####1.5.0
+
+* [Feature] 加入 [**plumber.js**](https://github.com/zhongliangjun1/plumber.js)，你先期抵达客户端的页面模块再也不用等待 dom ready 了，具体见 *Advanced(5)*。
+
 
