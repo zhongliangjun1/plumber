@@ -5,6 +5,7 @@ import com.dianping.plumber.core.*;
 import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
 import com.dianping.plumber.core.workers.PlumberWorker;
 import com.dianping.plumber.exception.PlumberPipeTimeoutException;
+import com.dianping.plumber.utils.EnvUtils;
 import com.dianping.plumber.utils.StringUtils;
 import com.dianping.plumber.view.ViewRenderer;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -58,6 +59,10 @@ public class PlumberPipeWorker extends PlumberWorker {
             if ( resultType==ResultType.SUCCESS ) {
                 String name = definition.getName();
                 String viewSource = definition.getViewSource();
+                if ( EnvUtils.isDev() ) { // for refresh
+                    String viewPath = definition.getViewPath();
+                    viewSource = PlumberWorkerDefinitionsRepo.getViewSourceLoader().load(viewPath);
+                }
                 ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
                 String result = viewRenderer.render(name, viewSource, modelForView);
                 if ( StringUtils.isNotEmpty(result) )
@@ -67,7 +72,7 @@ public class PlumberPipeWorker extends PlumberWorker {
 
             logger.error("pipe " + definition.getName() + " execute failure", e);
 
-            if ( isDevEnv() ) {
+            if ( EnvUtils.isDev() ) {
                 try {
                     String result = ExceptionUtils.getFullStackTrace(e);
                     if ( StringUtils.isNotEmpty(result) )

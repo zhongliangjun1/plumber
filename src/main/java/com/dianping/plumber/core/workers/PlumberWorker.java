@@ -1,7 +1,5 @@
 package com.dianping.plumber.core.workers;
 
-import com.dianping.plumber.config.PlumberConfig;
-import com.dianping.plumber.core.PlumberGlobals;
 import com.dianping.plumber.core.definitions.PlumberPageletDefinition;
 import org.apache.log4j.Logger;
 
@@ -44,9 +42,6 @@ public abstract class PlumberWorker implements Runnable {
         return modelForView;
     }
 
-    protected static boolean isDevEnv() {
-        return PlumberGlobals.DEV_ENV.equals(PlumberConfig.getEnv());
-    }
 
 
 }

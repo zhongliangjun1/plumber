@@ -11,7 +11,7 @@
 
     <groupId>com.dianping</groupId>
     <artifactId>plumber</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
     <name>plumber</name>
     <url>http://maven.apache.org</url>
     <packaging>jar</packaging>

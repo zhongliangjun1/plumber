@@ -6,6 +6,7 @@ import com.dianping.plumber.core.PlumberWorkerDefinitionsRepo;
 import com.dianping.plumber.core.ResultType;
 import com.dianping.plumber.core.definitions.PlumberBarrierDefinition;
 import com.dianping.plumber.core.workers.PlumberWorker;
+import com.dianping.plumber.utils.EnvUtils;
 import com.dianping.plumber.utils.StringUtils;
 import com.dianping.plumber.view.ViewRenderer;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -51,6 +52,10 @@ public class PlumberBarrierWorker extends PlumberWorker {
 
             if ( resultType==ResultType.SUCCESS ) {
                 String viewSource = definition.getViewSource();
+                if ( EnvUtils.isDev() ) { // for refresh
+                    String viewPath = definition.getViewPath();
+                    viewSource = PlumberWorkerDefinitionsRepo.getViewSourceLoader().load(viewPath);
+                }
                 ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
                 String result = viewRenderer.render(name, viewSource, modelForView);
                 if ( StringUtils.isNotEmpty(result) )
@@ -59,7 +64,7 @@ public class PlumberBarrierWorker extends PlumberWorker {
 
         } catch (Exception e) {
 
-            if ( isDevEnv() ) {
+            if ( EnvUtils.isDev() ) {
                 String result = ExceptionUtils.getFullStackTrace(e);
                 if ( StringUtils.isNotEmpty(result) )
                     renderResult = result;

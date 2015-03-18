@@ -1,6 +1,7 @@
 package com.dianping.plumber.view.support.renderer.freemarker;
 
 import com.dianping.plumber.config.PlumberConfig;
+import com.dianping.plumber.utils.EnvUtils;
 import com.dianping.plumber.utils.StringUtils;
 import com.dianping.plumber.view.ViewRenderer;
 import freemarker.cache.WebappTemplateLoader;
@@ -40,7 +41,7 @@ public class FreemarkerRenderer implements ViewRenderer {
 
     private Template getTemplate(String viewName, String viewSource) {
         Template template = templateCache.get(viewName);
-        if (template == null) {
+        if (template == null || EnvUtils.isDev() ) {
             Configuration config = new Configuration();
             config.setTemplateUpdateDelay(600000);
             config.setObjectWrapper(ObjectWrapper.BEANS_WRAPPER);

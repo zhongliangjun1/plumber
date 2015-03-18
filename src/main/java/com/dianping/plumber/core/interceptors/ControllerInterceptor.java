@@ -6,6 +6,7 @@ import com.dianping.plumber.core.definitions.PlumberControllerDefinition;
 import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
 import com.dianping.plumber.exception.PlumberRuntimeException;
 import com.dianping.plumber.utils.CollectionUtils;
+import com.dianping.plumber.utils.EnvUtils;
 import com.dianping.plumber.utils.MapUtils;
 import com.dianping.plumber.utils.ResponseUtils;
 import com.dianping.plumber.view.ViewRenderer;
@@ -54,6 +55,10 @@ public class ControllerInterceptor implements Interceptor {
 
         PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(controllerName);
         String viewSource = controllerDefinition.getViewSource();
+        if ( EnvUtils.isDev() ) { // for refresh
+            String viewPath = controllerDefinition.getViewPath();
+            viewSource = PlumberWorkerDefinitionsRepo.getViewSourceLoader().load(viewPath);
+        }
         ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
         String renderResult = viewRenderer.render(controllerName, viewSource, invocation.getModelForControllerView());
 
