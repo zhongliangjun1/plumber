@@ -32,7 +32,7 @@
 	<dependency>
 	  <groupId>com.dianping</groupId>
 	  <artifactId>plumber</artifactId>
-	  <version>1.4.0</version>
+	  <version>1.6.0</version>
 	</dependency>
 	
 ###2) 添加 plumber.yaml 配置
@@ -572,5 +572,9 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 ####1.5.0
 
 * [Feature] 加入 [**plumber.js**](https://github.com/zhongliangjun1/plumber.js)，你先期抵达客户端的页面模块再也不用等待 dom ready 了，具体见 *Advanced(5)*。
+
+####1.6.0
+
+* [Feature] 现在在 **dev** 环境下，**FreemarkerRenderer** 会在页面模板文件动态刷新后始终 render 最新的模板。
 
 
