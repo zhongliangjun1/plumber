@@ -9,6 +9,7 @@ target
 .scala_dependencies
 .externalToolBuilders
 .factorypath
+bin
 # ignore IDEA files
 *.iml
 *.ipr
@@ -18,3 +19,4 @@ atlassian-ide-plugin.xml
 maven-ant-tasks.jar
 test-output
 classes
+.DS_Store
