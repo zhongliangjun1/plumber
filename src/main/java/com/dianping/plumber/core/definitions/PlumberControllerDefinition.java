@@ -1,9 +1,9 @@
 package com.dianping.plumber.core.definitions;
 
-import com.dianping.plumber.core.PlumberController;
-
 import java.lang.reflect.Field;
 import java.util.List;
+
+import com.dianping.plumber.core.PlumberController;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,21 +14,19 @@ import java.util.List;
  */
 public class PlumberControllerDefinition {
 
-    private String name;
-    private String viewPath;
-    private String viewSource;
+    private String                         name;
+    private String                         viewPath;
+    private String                         viewSource;
 
-    private List<String> barrierNames;
+    private List<String>                   barrierNames;
     private List<PlumberBarrierDefinition> barrierDefinitions;
 
-    private List<String> pipeNames;
-    private List<PlumberPipeDefinition> pipeDefinitions;
-    private boolean hasPriority;
+    private List<String>                   pipeNames;
+    private List<PlumberPipeDefinition>    pipeDefinitions;
+    private boolean                        hasPriority;
 
-    private Class<PlumberController> controllerClass;
-    private List<Field> paramFromRequestFields;
-
-
+    private Class<PlumberController>       controllerClass;
+    private List<Field>                    paramFromRequestFields;
 
     public List<String> getBarrierNames() {
         return barrierNames;

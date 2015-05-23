@@ -1,9 +1,9 @@
 package com.dianping.plumber.core.definitions;
 
-import com.dianping.plumber.core.PlumberPagelet;
-
 import java.lang.reflect.Field;
 import java.util.List;
+
+import com.dianping.plumber.core.PlumberPagelet;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,14 +14,14 @@ import java.util.List;
  */
 public class PlumberPageletDefinition {
 
-    private String name;
+    private String                name;
 
     private Class<PlumberPagelet> pageletClass;
-    private List<Field> paramFromRequestFields;
-    private List<Field> paramFromControllerFields;
+    private List<Field>           paramFromRequestFields;
+    private List<Field>           paramFromControllerFields;
 
-    protected String viewPath;
-    protected String viewSource;
+    protected String              viewPath;
+    protected String              viewSource;
 
     public String getName() {
         return name;
