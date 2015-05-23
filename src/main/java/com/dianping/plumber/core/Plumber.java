@@ -1,114 +1,70 @@
 package com.dianping.plumber.core;
 
-import com.dianping.plumber.config.PlumberConfig;
-import com.dianping.plumber.config.PlumberConfigOverrider;
-import com.dianping.plumber.config.PlumberConfigOverriderFactory;
-import com.dianping.plumber.core.definitions.PlumberControllerDefinition;
-import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
-import com.dianping.plumber.exception.PlumberInitializeFailureException;
-import com.dianping.plumber.exception.PlumberRuntimeException;
-import com.dianping.plumber.utils.CollectionUtils;
-import com.dianping.plumber.utils.StringUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.config.TypedStringValue;
-import org.springframework.beans.factory.support.ManagedList;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import static com.dianping.plumber.utils.ConfigurationUtils.loadOverrideConfiguration;
+import static com.dianping.plumber.utils.ResponseUtils.disableNginxProxyBuffering;
+import static com.dianping.plumber.utils.ResponseUtils.setResponseContentType;
+
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+import com.dianping.plumber.exception.PlumberRuntimeException;
+import com.dianping.plumber.utils.StringUtils;
 
 /**
- * Created with IntelliJ IDEA.
- * Author: liangjun.zhong
- * Date: 14-11-2
- * Time: AM12:59
- * To change this template use File | Settings | File Templates.
+ * @author zhongliangjun1@gmail.com
+ * @version $Id: ConfigurationUtils.java, v 0.1 5/23/15 3:41 PM liangjun.zhong Exp $$
  */
 public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAware {
 
-    private static Logger logger = Logger.getLogger(Plumber.class);
+    private static Logger      logger = Logger.getLogger(Plumber.class);
 
     private ApplicationContext applicationContext;
 
-
-    public ResultType execute(String plumberControllerName, Map<String, Object> paramsForController,
-                        HttpServletRequest request,  HttpServletResponse response) {
+    public ResultType execute(String plumberControllerName,
+                              Map<String, Object> paramsForController, HttpServletRequest request,
+                              HttpServletResponse response) {
 
         validate(plumberControllerName, paramsForController, request, response);
 
         prepare(plumberControllerName, paramsForController, request, response);
 
-        InvocationContext invocationContext = new InvocationContext(plumberControllerName, applicationContext,
-                paramsForController, request, response);
+        InvocationContext invocationContext = new InvocationContext(plumberControllerName,
+            applicationContext, paramsForController, request, response);
         try {
-             return invocationContext.invoke();
+            return invocationContext.invoke();
         } catch (Exception e) {
             Exception runtimeException = new PlumberRuntimeException(e);
-            logger.error("some exception occured during the running time", runtimeException);
+            logger.error("some exception occurred during the running time", runtimeException);
             return ResultType.ERROR;
         }
     }
 
     private void validate(String plumberControllerName, Map<String, Object> paramsForController,
-                         HttpServletRequest request,  HttpServletResponse response) {
+                          HttpServletRequest request, HttpServletResponse response) {
 
-        if ( StringUtils.isEmpty(plumberControllerName) || applicationContext.getBean(plumberControllerName)==null )
-            throw new PlumberRuntimeException(new IllegalArgumentException("invalid controllerName : " + plumberControllerName ));
+        if (StringUtils.isEmpty(plumberControllerName)
+            || applicationContext.getBean(plumberControllerName) == null)
+            throw new PlumberRuntimeException(new IllegalArgumentException(
+                "invalid controllerName : " + plumberControllerName));
 
-        if ( response==null )
-            throw new PlumberRuntimeException(new IllegalArgumentException("response can not be null"));
+        if (response == null)
+            throw new PlumberRuntimeException(new IllegalArgumentException(
+                "response can not be null"));
     }
 
     private void prepare(String plumberControllerName, Map<String, Object> paramsForController,
-                         HttpServletRequest request,  HttpServletResponse response) {
-
+                         HttpServletRequest request, HttpServletResponse response) {
         setResponseContentType(response);
-
         disableNginxProxyBuffering(plumberControllerName, response);
-
-    }
-
-    private void setResponseContentType(HttpServletResponse response) {
-
-        if ( StringUtils.isNotEmpty(response.getContentType()) )
-            return;
-
-        String contentType = PlumberConfig.getResponseContentType();
-        boolean noCharsetInContentType = true;
-        if ( contentType.toLowerCase().indexOf("charset=")!=-1 )
-            noCharsetInContentType = false;
-
-        if ( noCharsetInContentType ) {
-            response.setContentType(
-                    contentType + "; charset=" + PlumberConfig.getViewEncoding());
-        } else {
-            response.setContentType(contentType);
-        }
-    }
-
-    /**
-     * When buffering is disabled, the response is passed to a client synchronously,
-     * immediately as it is received. Nginx will not try to read the whole response from the proxied server.
-     * To learn more : http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering
-     */
-    private void disableNginxProxyBuffering(String plumberControllerName, HttpServletResponse response) {
-
-        PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(plumberControllerName);
-        List<PlumberPipeDefinition> pipeDefinitions = controllerDefinition.getPipeDefinitions();
-
-        if ( !CollectionUtils.isEmpty(pipeDefinitions) ) { // only when having pagelet of pipe type
-            response.setHeader("X-Accel-Buffering", "no");
-        }
     }
 
     @Override
@@ -117,28 +73,15 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
     }
 
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
+                                                                                   throws BeansException {
         loadOverrideConfiguration();
         resetPlumberWorkerScopeAndRegister(beanFactory);
         prepareWorkerDefinitions();
     }
 
-    private static void loadOverrideConfiguration() {
-        String configOverriderFactory = PlumberConfig.getConfigOverriderFactory();
-        if ( StringUtils.isNotEmpty(configOverriderFactory) ) {
-            try {
-                Class clazz = Class.forName(configOverriderFactory);
-                PlumberConfigOverriderFactory factory = (PlumberConfigOverriderFactory) clazz.newInstance();
-                PlumberConfigOverrider overrider = factory.getConfigOverrider();
-                overrider.override();
-            } catch (Exception e) {
-                throw new PlumberInitializeFailureException("can not load your override configurations",e);
-            }
-            logger.info("plumber : load override configurations success");
-        }
-    }
-
     private static volatile boolean hasReset = false;
+
     /**
      * reset PlumberPipe PlumberBarrier and PlumberController scope to be prototype
      * make sure Plumber to be singleton
@@ -146,105 +89,24 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
      * @param beanFactory
      */
     private static void resetPlumberWorkerScopeAndRegister(ConfigurableListableBeanFactory beanFactory) {
-        if ( !hasReset ) {
+        if (!hasReset) {
+            resetPlumberWorkerScopeAndRegister(beanFactory);
             hasReset = true;
-            String[] beanDefinitionNames = beanFactory.getBeanDefinitionNames();
-            if (beanDefinitionNames!=null && beanDefinitionNames.length>0) {
-                for (String beanDefinitionName : beanDefinitionNames) {
-
-                    BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDefinitionName);
-                    String beanClassName = beanDefinition.getBeanClassName();
-                    if ( StringUtils.isEmpty(beanClassName) )
-                        continue;
-
-                    try {
-                        Class clazz = Class.forName(beanClassName);
-                        if ( PlumberController.class.isAssignableFrom(clazz) ) {
-
-                            beanDefinition.setScope("prototype"); // reset PlumberController scope
-                            String controllerViewPath = getViewPath(beanDefinitionName, beanDefinition);
-                            List<String> barrierNamesInSpringBeanConfig = getBarrierNames(beanDefinition);
-                            List<String> pipeNamesInSpringBeanConfig = getPipeNames(beanDefinition);
-                            PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName, controllerViewPath, clazz,
-                                    barrierNamesInSpringBeanConfig, pipeNamesInSpringBeanConfig);
-
-                        } else if ( PlumberPagelet.class.isAssignableFrom(clazz) ) {
-
-                            beanDefinition.setScope("prototype"); // reset PlumberPagelet scope
-                            String pageletViewPath = getViewPath(beanDefinitionName, beanDefinition);
-                            PlumberWorkerDefinitionsRepo.pageletRegister(beanDefinitionName, pageletViewPath, clazz);
-
-                        } else if ( Plumber.class.isAssignableFrom(clazz) ) {
-
-                            beanDefinition.setScope("singleton"); // reset Plumber scope
-
-                        }
-                    } catch (ClassNotFoundException e) {
-                        throw new PlumberInitializeFailureException(e);
-                    }
-
-                }
-                logger.info("plumber : reset worker's scope and register to definitions repo success");
-            }
+            logger.info("plumber : reset worker's scope and register to definitions repo success");
         }
     }
 
     private static volatile boolean hasPrepared = false;
+
     /**
      * prepare definitions of PlumberPipe PlumberBarrier and PlumberController
      */
     private static void prepareWorkerDefinitions() {
-        if ( !hasPrepared ) {
+        if (!hasPrepared) {
             PlumberWorkerDefinitionsRepo.prepareWorkerDefinitions();
+            hasPrepared = true;
             logger.info("plumber : prepare worker's definitions success");
         }
     }
-
-    private static String getViewPath(String beanName, BeanDefinition beanDefinition) {
-
-        String viewPath = null;
-        MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
-        PropertyValue propertyValue = propertyValues.getPropertyValue("viewPath");
-        if ( propertyValue!=null ) {
-            TypedStringValue typedStringValue = (TypedStringValue) propertyValue.getValue();
-            String value = typedStringValue.getValue();
-            if ( StringUtils.isNotEmpty(value) ) {
-                viewPath = value;
-            }
-        }
-
-        if ( StringUtils.isEmpty(viewPath) )
-            throw new PlumberInitializeFailureException(beanName + " can not without viewPath");
-
-        return viewPath;
-    }
-
-    private static List<String> getBarrierNames(BeanDefinition beanDefinition) {
-        return getPageletNames("barrierNames", beanDefinition);
-    }
-
-    private static List<String> getPipeNames(BeanDefinition beanDefinition) {
-        return getPageletNames("pipeNames", beanDefinition);
-    }
-
-    private static List<String> getPageletNames(String propertyName, BeanDefinition beanDefinition) {
-        List<String> names = new ArrayList<String>();
-
-        MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
-        PropertyValue propertyValue = propertyValues.getPropertyValue(propertyName);
-        if ( propertyValue!=null ) {
-            ManagedList<TypedStringValue> managedList = (ManagedList<TypedStringValue>) propertyValue.getValue();
-            if ( !CollectionUtils.isEmpty(managedList) ) {
-                for (TypedStringValue typedStringValue : managedList) {
-                    names.add(typedStringValue.getValue());
-                }
-            }
-        }
-
-        return names;
-    }
-
-
-
 
 }
