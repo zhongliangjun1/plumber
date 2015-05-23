@@ -37,15 +37,7 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
 
         prepare(plumberControllerName, paramsForController, request, response);
 
-        InvocationContext invocationContext = new InvocationContext(plumberControllerName,
-            applicationContext, paramsForController, request, response);
-        try {
-            return invocationContext.invoke();
-        } catch (Exception e) {
-            Exception runtimeException = new PlumberRuntimeException(e);
-            logger.error("some exception occurred during the running time", runtimeException);
-            return ResultType.ERROR;
-        }
+        return invoke(plumberControllerName, paramsForController, request, response);
     }
 
     private void validate(String plumberControllerName, Map<String, Object> paramsForController,
@@ -67,6 +59,20 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
         disableNginxProxyBuffering(plumberControllerName, response);
     }
 
+    private ResultType invoke(String plumberControllerName,
+                              Map<String, Object> paramsForController, HttpServletRequest request,
+                              HttpServletResponse response) {
+        try {
+            InvocationContext invocationContext = new InvocationContext(plumberControllerName,
+                applicationContext, paramsForController, request, response);
+            return invocationContext.invoke();
+        } catch (Exception e) {
+            Exception runtimeException = new PlumberRuntimeException(e);
+            logger.error("some exception occurred during the running time", runtimeException);
+            return ResultType.ERROR;
+        }
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -83,9 +89,9 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
     private static volatile boolean hasReset = false;
 
     /**
-     * reset PlumberPipe PlumberBarrier and PlumberController scope to be prototype
-     * make sure Plumber to be singleton
-     * register them to plumberWorkerDefinitionsRepo
+     * 1. Reset PlumberPipe PlumberBarrier and PlumberController scope to be prototype
+     * 2. Make sure Plumber scope to be singleton
+     * 3. Register them to plumberWorkerDefinitionsRepo
      * @param beanFactory
      */
     private static void resetPlumberWorkerScopeAndRegister(ConfigurableListableBeanFactory beanFactory) {
