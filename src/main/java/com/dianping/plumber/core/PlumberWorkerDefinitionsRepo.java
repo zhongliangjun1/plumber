@@ -219,7 +219,6 @@ public class PlumberWorkerDefinitionsRepo {
                                 PlumberPipeDefinition pipeDefinition = new PlumberPipeDefinition();
                                 BeanUtils.copyProperties(pageletDefinition, pipeDefinition);
                                 pipeDefinition.setPriority(pipePriority);
-                                pipeDefinition.setName(pipeName);
                                 pipeDefinitions.add(pipeDefinition);
                                 cleanPipeNames.add(pipeName);
                             }
