@@ -4,10 +4,10 @@
  */
 package com.dianping.plumber.core.monitor;
 
-import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
-
 import java.util.Date;
 import java.util.List;
+
+import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
 
 /**
  * @author zhongliangjun1@gmail.com
@@ -16,7 +16,7 @@ import java.util.List;
 public class MonitorEvent {
 
     private final List<PlumberPipeDefinition> pipeDefinitions;
-    private final Date startTimeStamp = new Date();
+    private final Date                        startTimeStamp = new Date();
 
     public MonitorEvent(List<PlumberPipeDefinition> pipeDefinitions) {
         this.pipeDefinitions = pipeDefinitions;
