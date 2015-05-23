@@ -28,26 +28,20 @@ public class PlumberPipeWorker extends PlumberWorker {
 
     private final PlumberPagelet pipe;
     private final LinkedBlockingQueue<String> pipeRenderResultQueue;
-    private final Lock flushLock;
-    private final Condition flushCondition;
-    private final AtomicInteger currentPipeSeqLocation;
+    private final boolean hasPriority;
     private final ResultReturnedFlag resultReturnedFlag;
 
     public PlumberPipeWorker(PlumberPipeDefinition definition,
                              Map<String, Object> paramsFromRequest,
                              Map<String, Object> paramsFromController,
                              PlumberPagelet pipe,
-                             Lock flushLock,
-                             Condition flushCondition,
-                             AtomicInteger currentPipeSeqLocation,
                              LinkedBlockingQueue<String> pipeRenderResultQueue,
+                             boolean hasPriority,
                              ResultReturnedFlag resultReturnedFlag) {
         super(definition, paramsFromRequest, paramsFromController);
         this.pipe = pipe;
-        this.flushLock = flushLock;
-        this.flushCondition = flushCondition;
-        this.currentPipeSeqLocation = currentPipeSeqLocation;
         this.pipeRenderResultQueue = pipeRenderResultQueue;
+        this.hasPriority = hasPriority;
         this.resultReturnedFlag = resultReturnedFlag;
     }
 

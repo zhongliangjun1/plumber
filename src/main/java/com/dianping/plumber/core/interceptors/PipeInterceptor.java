@@ -1,5 +1,12 @@
 package com.dianping.plumber.core.interceptors;
 
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import org.apache.log4j.Logger;
+
 import com.dianping.plumber.core.*;
 import com.dianping.plumber.core.concurrent.Executor;
 import com.dianping.plumber.core.definitions.PlumberControllerDefinition;
@@ -7,16 +14,6 @@ import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
 import com.dianping.plumber.core.workers.PlumberPipeWorker;
 import com.dianping.plumber.exception.PlumberRuntimeException;
 import com.dianping.plumber.utils.CollectionUtils;
-import org.apache.log4j.Logger;
-
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,31 +30,27 @@ public class PipeInterceptor implements Interceptor {
     public ResultType intercept(InvocationContext invocation) throws Exception {
 
         String controllerName = invocation.getControllerName();
-        PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo.getPlumberControllerDefinition(controllerName);
+        PlumberControllerDefinition controllerDefinition = PlumberWorkerDefinitionsRepo
+            .getPlumberControllerDefinition(controllerName);
         List<PlumberPipeDefinition> pipeDefinitions = controllerDefinition.getPipeDefinitions();
 
-        if ( !CollectionUtils.isEmpty(pipeDefinitions) ) {
+        if (!CollectionUtils.isEmpty(pipeDefinitions)) {
 
             Map<String, Object> paramsFromRequest = invocation.getParamsFromRequest();
             Map<String, Object> paramsFromController = invocation.getParamsForPagelets();
-
-            AtomicInteger currentPipeSeqLocation = invocation.getCurrentPipeSeqLocation();
-            Lock flushLock = null;
-            Condition flushCondition = null;
-            if ( currentPipeSeqLocation!=null ) {
-                flushLock = new ReentrantLock();
-                flushCondition = flushLock.newCondition();
-            }
+            boolean hasPriority = controllerDefinition.isHasPriority();
 
             for (PlumberPipeDefinition definition : pipeDefinitions) {
                 String name = definition.getName();
-                PlumberPagelet pipe = (PlumberPagelet) invocation.getApplicationContext().getBean(name);
+                PlumberPagelet pipe = (PlumberPagelet) invocation.getApplicationContext().getBean(
+                    name);
                 injectAnnotationFields(pipe, definition, paramsFromRequest, paramsFromController);
-                LinkedBlockingQueue<String> pipeRenderResultQueue = invocation.getPipeRenderResultQueue();
+                LinkedBlockingQueue<String> pipeRenderResultQueue = invocation
+                    .getPipeRenderResultQueue();
                 ResultReturnedFlag resultReturnedFlag = invocation.getResultReturnedFlag();
-                PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromRequest, paramsFromController,
-                        pipe, flushLock, flushCondition, currentPipeSeqLocation,
-                        pipeRenderResultQueue, resultReturnedFlag);
+                PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromRequest,
+                    paramsFromController, pipe, pipeRenderResultQueue, hasPriority,
+                    resultReturnedFlag);
                 Executor.getInstance().submit(pipeWorker);
             }
 
@@ -65,8 +58,7 @@ public class PipeInterceptor implements Interceptor {
         return ResultType.SUCCESS;
     }
 
-    private void injectAnnotationFields(PlumberPagelet pipe,
-                                        PlumberPipeDefinition pipeDefinition,
+    private void injectAnnotationFields(PlumberPagelet pipe, PlumberPipeDefinition pipeDefinition,
                                         Map<String, Object> paramsFromRequest,
                                         Map<String, Object> paramsFromController) {
 
@@ -79,20 +71,19 @@ public class PipeInterceptor implements Interceptor {
 
     }
 
-    private void injectAnnotationFields(String pipeName,
-                                        PlumberPagelet pipe,
-                                        List<Field> fields,
+    private void injectAnnotationFields(String pipeName, PlumberPagelet pipe, List<Field> fields,
                                         Map<String, Object> params) {
 
-        if ( !CollectionUtils.isEmpty(fields) && params!=null ) {
-            for ( Field field : fields ) {
+        if (!CollectionUtils.isEmpty(fields) && params != null) {
+            for (Field field : fields) {
                 String fieldName = field.getName();
                 Object fieldValue = params.get(fieldName);
-                if( fieldValue!=null ){
+                if (fieldValue != null) {
                     try {
                         field.set(pipe, fieldValue);
                     } catch (Exception e) {
-                        String msg = "inject annotation field of " + fieldName + " for pipe "+ pipeName + " failure";
+                        String msg = "inject annotation field of " + fieldName + " for pipe "
+                                     + pipeName + " failure";
                         logger.error(msg, new PlumberRuntimeException(msg, e));
                     }
                 }
@@ -100,6 +91,5 @@ public class PipeInterceptor implements Interceptor {
         }
 
     }
-
 
 }
