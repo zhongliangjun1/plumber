@@ -1,6 +1,5 @@
 package com.dianping.plumber.core;
 
-import static com.dianping.plumber.utils.ConfigurationUtils.loadOverrideConfiguration;
 import static com.dianping.plumber.utils.ResponseUtils.disableNginxProxyBuffering;
 import static com.dianping.plumber.utils.ResponseUtils.setResponseContentType;
 
@@ -17,6 +16,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import com.dianping.plumber.exception.PlumberRuntimeException;
+import com.dianping.plumber.utils.ConfigurationUtils;
+import com.dianping.plumber.utils.SpringBeanDefinitionUtils;
 import com.dianping.plumber.utils.StringUtils;
 
 /**
@@ -86,6 +87,16 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
         prepareWorkerDefinitions();
     }
 
+    private static volatile boolean hasOverride = false;
+
+    private static void loadOverrideConfiguration() {
+        if (!hasOverride) {
+            ConfigurationUtils.loadOverrideConfiguration();
+            hasOverride = true;
+            logger.info("plumber : load override configurations success");
+        }
+    }
+
     private static volatile boolean hasReset = false;
 
     /**
@@ -96,7 +107,7 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
      */
     private static void resetPlumberWorkerScopeAndRegister(ConfigurableListableBeanFactory beanFactory) {
         if (!hasReset) {
-            resetPlumberWorkerScopeAndRegister(beanFactory);
+            SpringBeanDefinitionUtils.resetPlumberWorkerScopeAndRegister(beanFactory);
             hasReset = true;
             logger.info("plumber : reset worker's scope and register to definitions repo success");
         }

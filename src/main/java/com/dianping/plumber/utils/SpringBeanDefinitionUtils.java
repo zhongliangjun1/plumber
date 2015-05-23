@@ -7,13 +7,7 @@ package com.dianping.plumber.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dianping.plumber.core.Plumber;
-import com.dianping.plumber.core.PlumberController;
-import com.dianping.plumber.core.PlumberPagelet;
-import com.dianping.plumber.core.PlumberWorkerDefinitionsRepo;
-import com.dianping.plumber.exception.PlumberInitializeFailureException;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -21,58 +15,17 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.ManagedList;
 
+import com.dianping.plumber.core.Plumber;
+import com.dianping.plumber.core.PlumberController;
+import com.dianping.plumber.core.PlumberPagelet;
+import com.dianping.plumber.core.PlumberWorkerDefinitionsRepo;
+import com.dianping.plumber.exception.PlumberInitializeFailureException;
+
 /**
  * @author zhongliangjun1@gmail.com
  * @version $Id: SpringBeanDefinitionUtils.java, v 0.1 5/23/15 3:33 PM liangjun.zhong Exp $$
  */
 public abstract class SpringBeanDefinitionUtils {
-
-    private static Logger logger = Logger.getLogger(SpringBeanDefinitionUtils.class);
-
-    public static List<String> getBarrierNames(BeanDefinition beanDefinition) {
-        return getPageletNames("barrierNames", beanDefinition);
-    }
-
-    public static List<String> getPipeNames(BeanDefinition beanDefinition) {
-        return getPageletNames("pipeNames", beanDefinition);
-    }
-
-    public static List<String> getPageletNames(String propertyName, BeanDefinition beanDefinition) {
-        List<String> names = new ArrayList<String>();
-
-        MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
-        PropertyValue propertyValue = propertyValues.getPropertyValue(propertyName);
-        if (propertyValue != null) {
-            ManagedList<TypedStringValue> managedList = (ManagedList<TypedStringValue>) propertyValue
-                .getValue();
-            if (!CollectionUtils.isEmpty(managedList)) {
-                for (TypedStringValue typedStringValue : managedList) {
-                    names.add(typedStringValue.getValue());
-                }
-            }
-        }
-
-        return names;
-    }
-
-    public static String getViewPath(String beanName, BeanDefinition beanDefinition) {
-
-        String viewPath = null;
-        MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
-        PropertyValue propertyValue = propertyValues.getPropertyValue("viewPath");
-        if (propertyValue != null) {
-            TypedStringValue typedStringValue = (TypedStringValue) propertyValue.getValue();
-            String value = typedStringValue.getValue();
-            if (StringUtils.isNotEmpty(value)) {
-                viewPath = value;
-            }
-        }
-
-        if (StringUtils.isEmpty(viewPath))
-            throw new PlumberInitializeFailureException(beanName + " can not without viewPath");
-
-        return viewPath;
-    }
 
     public static void resetPlumberWorkerScopeAndRegister(ConfigurableListableBeanFactory beanFactory) {
 
@@ -98,8 +51,8 @@ public abstract class SpringBeanDefinitionUtils {
                     List<String> barrierNamesInSpringBeanConfig = getBarrierNames(beanDefinition);
                     List<String> pipeNamesInSpringBeanConfig = getPipeNames(beanDefinition);
                     PlumberWorkerDefinitionsRepo.controllerRegister(beanDefinitionName,
-                            controllerViewPath, clazz, barrierNamesInSpringBeanConfig,
-                            pipeNamesInSpringBeanConfig);
+                        controllerViewPath, clazz, barrierNamesInSpringBeanConfig,
+                        pipeNamesInSpringBeanConfig);
 
                 } else if (PlumberPagelet.class.isAssignableFrom(clazz)) {
 
@@ -107,7 +60,7 @@ public abstract class SpringBeanDefinitionUtils {
                     beanDefinition.setScope("prototype");
                     String pageletViewPath = getViewPath(beanDefinitionName, beanDefinition);
                     PlumberWorkerDefinitionsRepo.pageletRegister(beanDefinitionName,
-                            pageletViewPath, clazz);
+                        pageletViewPath, clazz);
 
                 } else if (Plumber.class.isAssignableFrom(clazz)) {
 
@@ -120,6 +73,51 @@ public abstract class SpringBeanDefinitionUtils {
             }
         }
 
+    }
+
+    private static List<String> getBarrierNames(BeanDefinition beanDefinition) {
+        return getPageletNames("barrierNames", beanDefinition);
+    }
+
+    private static List<String> getPipeNames(BeanDefinition beanDefinition) {
+        return getPageletNames("pipeNames", beanDefinition);
+    }
+
+    private static List<String> getPageletNames(String propertyName, BeanDefinition beanDefinition) {
+        List<String> names = new ArrayList<String>();
+
+        MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+        PropertyValue propertyValue = propertyValues.getPropertyValue(propertyName);
+        if (propertyValue != null) {
+            ManagedList<TypedStringValue> managedList = (ManagedList<TypedStringValue>) propertyValue
+                .getValue();
+            if (!CollectionUtils.isEmpty(managedList)) {
+                for (TypedStringValue typedStringValue : managedList) {
+                    names.add(typedStringValue.getValue());
+                }
+            }
+        }
+
+        return names;
+    }
+
+    private static String getViewPath(String beanName, BeanDefinition beanDefinition) {
+
+        String viewPath = null;
+        MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+        PropertyValue propertyValue = propertyValues.getPropertyValue("viewPath");
+        if (propertyValue != null) {
+            TypedStringValue typedStringValue = (TypedStringValue) propertyValue.getValue();
+            String value = typedStringValue.getValue();
+            if (StringUtils.isNotEmpty(value)) {
+                viewPath = value;
+            }
+        }
+
+        if (StringUtils.isEmpty(viewPath))
+            throw new PlumberInitializeFailureException(beanName + " can not without viewPath");
+
+        return viewPath;
     }
 
 }
