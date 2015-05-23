@@ -1,5 +1,10 @@
 package com.dianping.plumber.core;
 
+import java.lang.reflect.Field;
+import java.util.*;
+
+import org.springframework.beans.BeanUtils;
+
 import com.dianping.plumber.annotation.ParamFromController;
 import com.dianping.plumber.annotation.ParamFromRequest;
 import com.dianping.plumber.config.PlumberConfig;
@@ -11,99 +16,104 @@ import com.dianping.plumber.exception.PlumberInitializeFailureException;
 import com.dianping.plumber.utils.CollectionUtils;
 import com.dianping.plumber.utils.StringUtils;
 import com.dianping.plumber.view.*;
-import org.springframework.beans.BeanUtils;
-
-import java.lang.reflect.Field;
-import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
  * Author: liangjun.zhong
  * Date: 14-11-5
  * Time: PM4:29
- * To change this template use File | Settings | File Templates.
  */
 public class PlumberWorkerDefinitionsRepo {
 
-    private final static List<String> controllerNames = new ArrayList<String>();
-    private final static List<String> pageletNames = new ArrayList<String>();
+    private final static List<String>                             controllerNames                              = new ArrayList<String>();
+    private final static List<String>                             pageletNames                                 = new ArrayList<String>();
 
-    private final static Map<String, List<String>> controllerBarrierNamesInSpringBeanConfigRepo = new HashMap<String, List<String>>();
-    private final static Map<String, List<String>> controllerPipeNamesInSpringBeanConfigRepo = new HashMap<String, List<String>>();
+    private final static Map<String, List<String>>                controllerBarrierNamesInSpringBeanConfigRepo = new HashMap<String, List<String>>();
+    private final static Map<String, List<String>>                controllerPipeNamesInSpringBeanConfigRepo    = new HashMap<String, List<String>>();
 
-    private final static Map<String, String> controllerViewPathsRepo = new HashMap<String, String>();
-    private final static Map<String, String> pageletViewPathsRepo = new HashMap<String, String>();
+    private final static Map<String, String>                      controllerViewPathsRepo                      = new HashMap<String, String>();
+    private final static Map<String, String>                      pageletViewPathsRepo                         = new HashMap<String, String>();
 
-    private final static Map<String, Class<PlumberController>> controllerClassesRepo = new HashMap<String, Class<PlumberController>>();
-    private final static Map<String, Class<PlumberPagelet>> pageletClassesRepo = new HashMap<String, Class<PlumberPagelet>>();
+    private final static Map<String, Class<PlumberController>>    controllerClassesRepo                        = new HashMap<String, Class<PlumberController>>();
+    private final static Map<String, Class<PlumberPagelet>>       pageletClassesRepo                           = new HashMap<String, Class<PlumberPagelet>>();
 
-    private final static Map<String, PlumberControllerDefinition> controllerDefinitionsRepo = new HashMap<String, PlumberControllerDefinition>();
-    private final static Map<String, PlumberPageletDefinition> pageletDefinitionsRepo = new HashMap<String, PlumberPageletDefinition>();
+    private final static Map<String, PlumberControllerDefinition> controllerDefinitionsRepo                    = new HashMap<String, PlumberControllerDefinition>();
+    private final static Map<String, PlumberPageletDefinition>    pageletDefinitionsRepo                       = new HashMap<String, PlumberPageletDefinition>();
 
-    private final static ViewSourceLoader viewSourceLoader;
-    private final static ViewRenderer viewRenderer;
+    private final static ViewSourceLoader                         viewSourceLoader;
+    private final static ViewRenderer                             viewRenderer;
 
     static {
         try {
-            ViewSourceLoaderFactory viewSourceLoaderFactory = (ViewSourceLoaderFactory) Class.forName(PlumberConfig.getViewSourceLoaderFactory()).newInstance();
+            ViewSourceLoaderFactory viewSourceLoaderFactory = (ViewSourceLoaderFactory) Class
+                .forName(PlumberConfig.getViewSourceLoaderFactory()).newInstance();
             viewSourceLoader = viewSourceLoaderFactory.getSourceLoader();
         } catch (Exception e) {
             throw new PlumberInitializeFailureException("prepare viewSourceLoader failure", e);
         }
 
         try {
-            ViewRendererFactory viewRendererFactory = (ViewRendererFactory) Class.forName(PlumberConfig.getViewRendererFactory()).newInstance();
+            ViewRendererFactory viewRendererFactory = (ViewRendererFactory) Class.forName(
+                PlumberConfig.getViewRendererFactory()).newInstance();
             viewRenderer = viewRendererFactory.getRenderer();
         } catch (Exception e) {
             throw new PlumberInitializeFailureException("prepare viewRenderer failure", e);
         }
     }
 
-    public static void controllerRegister(String controllerName, String viewPath, Class<PlumberController> controllerClass,
-                                          List<String> barrierNamesInSpringBeanConfig, List<String> pipeNamesInSpringBeanConfig) {
-        if ( !controllerNames.contains(controllerName) ) {
+    public static void controllerRegister(String controllerName, String viewPath,
+                                          Class<PlumberController> controllerClass,
+                                          List<String> barrierNamesInSpringBeanConfig,
+                                          List<String> pipeNamesInSpringBeanConfig) {
+        if (!controllerNames.contains(controllerName)) {
             controllerNames.add(controllerName);
         }
 
-        if ( StringUtils.isNotEmpty(viewPath) ) {
+        if (StringUtils.isNotEmpty(viewPath)) {
             controllerViewPathsRepo.put(controllerName, viewPath);
         } else {
-            throw new PlumberInitializeFailureException("controller " + controllerName + " can not find valid viewPath");
+            throw new PlumberInitializeFailureException("controller " + controllerName
+                                                        + " can not find valid viewPath");
         }
 
-        if ( controllerClass!=null ) {
+        if (controllerClass != null) {
             controllerClassesRepo.put(controllerName, controllerClass);
         } else {
-            throw new PlumberInitializeFailureException("controller " + controllerName + " can not find valid controllerClass");
+            throw new PlumberInitializeFailureException("controller " + controllerName
+                                                        + " can not find valid controllerClass");
         }
 
-        if ( !CollectionUtils.isEmpty(barrierNamesInSpringBeanConfig) ) {
-            controllerBarrierNamesInSpringBeanConfigRepo.put(controllerName, barrierNamesInSpringBeanConfig);
+        if (!CollectionUtils.isEmpty(barrierNamesInSpringBeanConfig)) {
+            controllerBarrierNamesInSpringBeanConfigRepo.put(controllerName,
+                barrierNamesInSpringBeanConfig);
         }
 
-        if ( !CollectionUtils.isEmpty(pipeNamesInSpringBeanConfig) ) {
-            controllerPipeNamesInSpringBeanConfigRepo.put(controllerName, pipeNamesInSpringBeanConfig);
+        if (!CollectionUtils.isEmpty(pipeNamesInSpringBeanConfig)) {
+            controllerPipeNamesInSpringBeanConfigRepo.put(controllerName,
+                pipeNamesInSpringBeanConfig);
         }
     }
 
-    public static void pageletRegister(String pageletName, String viewPath, Class<PlumberPagelet> pageletClass) {
-        if ( !pageletNames.contains(pageletName) ) {
+    public static void pageletRegister(String pageletName, String viewPath,
+                                       Class<PlumberPagelet> pageletClass) {
+        if (!pageletNames.contains(pageletName)) {
             pageletNames.add(pageletName);
         }
 
-        if ( StringUtils.isNotEmpty(viewPath) ) {
+        if (StringUtils.isNotEmpty(viewPath)) {
             pageletViewPathsRepo.put(pageletName, viewPath);
         } else {
-            throw new PlumberInitializeFailureException("pagelet " + pageletName + " can not find valid viewPath");
+            throw new PlumberInitializeFailureException("pagelet " + pageletName
+                                                        + " can not find valid viewPath");
         }
 
-        if ( pageletClass!=null ) {
+        if (pageletClass != null) {
             pageletClassesRepo.put(pageletName, pageletClass);
         } else {
-            throw new PlumberInitializeFailureException("pagelet " + pageletName + " can not find valid pageletClass");
+            throw new PlumberInitializeFailureException("pagelet " + pageletName
+                                                        + " can not find valid pageletClass");
         }
     }
-
 
     public static void prepareWorkerDefinitions() {
         preparePageletDefinitions();
@@ -112,9 +122,9 @@ public class PlumberWorkerDefinitionsRepo {
 
     private static void preparePageletDefinitions() {
         try {
-            if ( pageletNames.size()>0 ) {
+            if (pageletNames.size() > 0) {
                 for (String pageletName : pageletNames) {
-                    if ( pageletDefinitionsRepo.get(pageletName)==null ) {
+                    if (pageletDefinitionsRepo.get(pageletName) == null) {
                         PlumberPageletDefinition pageletDefinition = new PlumberPageletDefinition();
                         pageletDefinition.setName(pageletName);
 
@@ -127,9 +137,11 @@ public class PlumberWorkerDefinitionsRepo {
                         Class<PlumberPagelet> pageletClass = pageletClassesRepo.get(pageletName);
                         pageletDefinition.setPageletClass(pageletClass);
 
-                        Map<Class,List<Field>> fieldsMap = getParamAnnotationFields(pageletClass);
-                        pageletDefinition.setParamFromRequestFields(fieldsMap.get(ParamFromRequest.class));
-                        pageletDefinition.setParamFromControllerFields(fieldsMap.get(ParamFromController.class));
+                        Map<Class, List<Field>> fieldsMap = getParamAnnotationFields(pageletClass);
+                        pageletDefinition.setParamFromRequestFields(fieldsMap
+                            .get(ParamFromRequest.class));
+                        pageletDefinition.setParamFromControllerFields(fieldsMap
+                            .get(ParamFromController.class));
 
                         pageletDefinitionsRepo.put(pageletName, pageletDefinition);
                     }
@@ -140,12 +152,11 @@ public class PlumberWorkerDefinitionsRepo {
         }
     }
 
-
     private static void prepareControllerDefinitions() {
         try {
-            if ( controllerNames.size()>0 ) {
+            if (controllerNames.size() > 0) {
                 for (String controllerName : controllerNames) {
-                    if ( controllerDefinitionsRepo.get(controllerName)==null ) {
+                    if (controllerDefinitionsRepo.get(controllerName) == null) {
                         PlumberControllerDefinition controllerDefinition = new PlumberControllerDefinition();
                         controllerDefinition.setName(controllerName);
 
@@ -154,17 +165,20 @@ public class PlumberWorkerDefinitionsRepo {
                         String viewSource = viewSourceLoader.load(viewPath);
                         controllerDefinition.setViewSource(viewSource);
 
-                        Class<PlumberController> controllerClass = controllerClassesRepo.get(controllerName);
+                        Class<PlumberController> controllerClass = controllerClassesRepo
+                            .get(controllerName);
                         controllerDefinition.setControllerClass(controllerClass);
 
-                        Map<Class,List<Field>> fieldsMap = getParamAnnotationFields(controllerClass);
-                        controllerDefinition.setParamFromRequestFields(fieldsMap.get(ParamFromRequest.class));
+                        Map<Class, List<Field>> fieldsMap = getParamAnnotationFields(controllerClass);
+                        controllerDefinition.setParamFromRequestFields(fieldsMap
+                            .get(ParamFromRequest.class));
 
                         List<String> barrierNames = getBarrierNames(controllerName, viewSource);
-                        if ( !CollectionUtils.isEmpty(barrierNames) ) {
+                        if (!CollectionUtils.isEmpty(barrierNames)) {
                             List<PlumberBarrierDefinition> barrierDefinitions = new ArrayList<PlumberBarrierDefinition>();
                             for (String barrierName : barrierNames) {
-                                PlumberPageletDefinition pageletDefinition = pageletDefinitionsRepo.get(barrierName);
+                                PlumberPageletDefinition pageletDefinition = pageletDefinitionsRepo
+                                    .get(barrierName);
                                 PlumberBarrierDefinition barrierDefinition = new PlumberBarrierDefinition();
                                 BeanUtils.copyProperties(pageletDefinition, barrierDefinition);
                                 barrierDefinitions.add(barrierDefinition);
@@ -174,46 +188,44 @@ public class PlumberWorkerDefinitionsRepo {
                         }
 
                         List<String> pipeNames = getPipeNames(controllerName, viewSource);
-                        if ( !CollectionUtils.isEmpty(pipeNames) ) {
-                            Boolean hasSequence = null;
-                            List<Integer> seqLocations = new ArrayList<Integer>();
+                        if (!CollectionUtils.isEmpty(pipeNames)) {
+                            Boolean hasPriority = false;
                             List<PlumberPipeDefinition> pipeDefinitions = new ArrayList<PlumberPipeDefinition>();
                             List<String> cleanPipeNames = new ArrayList<String>();
                             for (String pipeName : pipeNames) {
 
-                                Integer pipeSeqLocation = null;
-                                if ( pipeName.indexOf("@")>0 ) {
-                                    if ( hasSequence!=null && hasSequence==false ) {
-                                        throw new PlumberInitializeFailureException("inconsistent pipe sequence configuration");
+                                Integer pipePriority = null;
+                                if (pipeName.indexOf("@") > 0) {
+                                    if (hasPriority != null && hasPriority == false) {
+                                        throw new PlumberInitializeFailureException(
+                                            "inconsistent pipe priority configuration");
                                     } else {
-                                        hasSequence = true;
+                                        hasPriority = true;
                                         String[] info = pipeName.split("@");
                                         pipeName = info[0];
-                                        pipeSeqLocation = Integer.parseInt(info[1]);
-                                        seqLocations.add(pipeSeqLocation);
+                                        pipePriority = Integer.parseInt(info[1]);
                                     }
                                 } else {
-                                    if ( hasSequence!=null && hasSequence==true ) {
-                                        throw new PlumberInitializeFailureException("inconsistent pipe sequence configuration");
+                                    if (hasPriority != null && hasPriority == true) {
+                                        throw new PlumberInitializeFailureException(
+                                            "inconsistent pipe priority configuration");
                                     } else {
-                                        hasSequence = false;
+                                        hasPriority = false;
                                     }
                                 }
 
-                                PlumberPageletDefinition pageletDefinition = pageletDefinitionsRepo.get(pipeName);
+                                PlumberPageletDefinition pageletDefinition = pageletDefinitionsRepo
+                                    .get(pipeName);
                                 PlumberPipeDefinition pipeDefinition = new PlumberPipeDefinition();
                                 BeanUtils.copyProperties(pageletDefinition, pipeDefinition);
-                                pipeDefinition.setSeqLocation(pipeSeqLocation);
+                                pipeDefinition.setPriority(pipePriority);
+                                pipeDefinition.setName(pipeName);
                                 pipeDefinitions.add(pipeDefinition);
                                 cleanPipeNames.add(pipeName);
                             }
+                            controllerDefinition.setHasPriority(hasPriority);
                             controllerDefinition.setPipeNames(cleanPipeNames);
                             controllerDefinition.setPipeDefinitions(pipeDefinitions);
-                            if ( hasSequence ) {
-                                Collections.sort(seqLocations);
-                                checkPipeSeqLocations(seqLocations);
-                                controllerDefinition.setStartingSeqLocation(seqLocations.get(0));
-                            }
                         }
 
                         controllerDefinitionsRepo.put(controllerName, controllerDefinition);
@@ -235,11 +247,12 @@ public class PlumberWorkerDefinitionsRepo {
         Set<String> barrierNames = new HashSet<String>();
 
         List<String> barrierNamesInViewSource = ViewParser.recognizeBarrierNames(viewSource);
-        if ( !CollectionUtils.isEmpty(barrierNamesInViewSource) )
+        if (!CollectionUtils.isEmpty(barrierNamesInViewSource))
             barrierNames.addAll(barrierNamesInViewSource);
 
-        List<String> barrierNamesInSpringBeanConfig = controllerBarrierNamesInSpringBeanConfigRepo.get(controllerName);
-        if ( !CollectionUtils.isEmpty(barrierNamesInSpringBeanConfig) )
+        List<String> barrierNamesInSpringBeanConfig = controllerBarrierNamesInSpringBeanConfigRepo
+            .get(controllerName);
+        if (!CollectionUtils.isEmpty(barrierNamesInSpringBeanConfig))
             barrierNames.addAll(barrierNamesInSpringBeanConfig);
 
         return new ArrayList<String>(barrierNames);
@@ -255,37 +268,38 @@ public class PlumberWorkerDefinitionsRepo {
         Set<String> pipeNames = new HashSet<String>();
 
         List<String> pipeNamesInViewSource = ViewParser.recognizePipeNames(viewSource);
-        if ( !CollectionUtils.isEmpty(pipeNamesInViewSource) )
+        if (!CollectionUtils.isEmpty(pipeNamesInViewSource))
             pipeNames.addAll(pipeNamesInViewSource);
 
-        List<String> pipeNamesInSpringBeanConfig = controllerPipeNamesInSpringBeanConfigRepo.get(controllerName);
-        if ( !CollectionUtils.isEmpty(pipeNamesInSpringBeanConfig) )
+        List<String> pipeNamesInSpringBeanConfig = controllerPipeNamesInSpringBeanConfigRepo
+            .get(controllerName);
+        if (!CollectionUtils.isEmpty(pipeNamesInSpringBeanConfig))
             pipeNames.addAll(pipeNamesInSpringBeanConfig);
 
         return new ArrayList<String>(pipeNames);
     }
 
+    private static Map<Class, List<Field>> getParamAnnotationFields(Class clazz) {
 
-    private static Map<Class,List<Field>> getParamAnnotationFields(Class clazz) {
-
-        Map<Class,List<Field>> result = new HashMap<Class, List<Field>>();
+        Map<Class, List<Field>> result = new HashMap<Class, List<Field>>();
         List<Field> paramFromRequestFields = new ArrayList<Field>();
         List<Field> paramFromControllerFields = new ArrayList<Field>();
 
         Field[] fields = clazz.getDeclaredFields();
 
-        if ( fields!=null ) {
-            for ( Field field : fields ) {
+        if (fields != null) {
+            for (Field field : fields) {
 
                 ParamFromRequest paramFromRequest = field.getAnnotation(ParamFromRequest.class);
-                if(paramFromRequest!=null){
+                if (paramFromRequest != null) {
                     field.setAccessible(true);
                     paramFromRequestFields.add(field);
                     continue;
                 }
 
-                ParamFromController paramFromController = field.getAnnotation(ParamFromController.class);
-                if(paramFromController!=null){
+                ParamFromController paramFromController = field
+                    .getAnnotation(ParamFromController.class);
+                if (paramFromController != null) {
                     field.setAccessible(true);
                     paramFromControllerFields.add(field);
                     continue;
@@ -298,21 +312,15 @@ public class PlumberWorkerDefinitionsRepo {
         return result;
     }
 
-    private static void checkPipeSeqLocations(List<Integer> seqLocations) {
-        for (int i = 1; i < seqLocations.size(); i++) {
-            Integer cur = seqLocations.get(i);
-            Integer pre = seqLocations.get(i-1);
-            if ( cur-pre!=1 )
-                throw new PlumberInitializeFailureException("Pipe's order should be one by one and could not be skipped!");
-        }
-    }
-
     public static PlumberControllerDefinition getPlumberControllerDefinition(String controllerName) {
-        if ( StringUtils.isEmpty(controllerName) )
-            throw new PlumberInitializeFailureException("illegal controllerName : "+controllerName);
+        if (StringUtils.isEmpty(controllerName))
+            throw new PlumberInitializeFailureException("illegal controllerName : "
+                                                        + controllerName);
         PlumberControllerDefinition definition = controllerDefinitionsRepo.get(controllerName);
-        if ( definition==null )
-            throw new PlumberInitializeFailureException("can not find ControllerDefinition of "+controllerName+" in controllerDefinitionsRepo");
+        if (definition == null)
+            throw new PlumberInitializeFailureException("can not find ControllerDefinition of "
+                                                        + controllerName
+                                                        + " in controllerDefinitionsRepo");
         return definition;
     }
 

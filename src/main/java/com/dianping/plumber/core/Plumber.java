@@ -22,7 +22,7 @@ import com.dianping.plumber.utils.StringUtils;
 
 /**
  * @author zhongliangjun1@gmail.com
- * @version $Id: ConfigurationUtils.java, v 0.1 5/23/15 3:41 PM liangjun.zhong Exp $$
+ * @version $Id: Plumber.java, v 0.1 5/23/15 3:41 PM liangjun.zhong Exp $$
  */
 public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAware {
 

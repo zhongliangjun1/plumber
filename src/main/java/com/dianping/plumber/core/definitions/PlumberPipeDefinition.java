@@ -1,7 +1,5 @@
 package com.dianping.plumber.core.definitions;
 
-import com.dianping.plumber.core.definitions.PlumberPageletDefinition;
-
 /**
  * Created with IntelliJ IDEA.
  * Author: liangjun.zhong
@@ -11,13 +9,13 @@ import com.dianping.plumber.core.definitions.PlumberPageletDefinition;
  */
 public class PlumberPipeDefinition extends PlumberPageletDefinition {
 
-    private Integer seqLocation;
+    private Integer priority;
 
-    public Integer getSeqLocation() {
-        return seqLocation;
+    public Integer getPriority() {
+        return priority;
     }
 
-    public void setSeqLocation(Integer seqLocation) {
-        this.seqLocation = seqLocation;
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 }

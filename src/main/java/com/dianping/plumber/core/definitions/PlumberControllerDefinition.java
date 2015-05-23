@@ -23,7 +23,7 @@ public class PlumberControllerDefinition {
 
     private List<String> pipeNames;
     private List<PlumberPipeDefinition> pipeDefinitions;
-    private Integer startingSeqLocation;
+    private boolean hasPriority;
 
     private Class<PlumberController> controllerClass;
     private List<Field> paramFromRequestFields;
@@ -42,12 +42,12 @@ public class PlumberControllerDefinition {
         return barrierDefinitions;
     }
 
-    public Integer getStartingSeqLocation() {
-        return startingSeqLocation;
+    public boolean isHasPriority() {
+        return hasPriority;
     }
 
-    public void setStartingSeqLocation(Integer startingSeqLocation) {
-        this.startingSeqLocation = startingSeqLocation;
+    public void setHasPriority(boolean hasPriority) {
+        this.hasPriority = hasPriority;
     }
 
     public void setBarrierDefinitions(List<PlumberBarrierDefinition> barrierDefinitions) {
