@@ -1,5 +1,6 @@
 package com.dianping.plumber.core.workers;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -9,9 +10,12 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import com.dianping.plumber.config.PlumberConfig;
 import com.dianping.plumber.core.*;
 import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
+import com.dianping.plumber.core.monitor.Monitor;
+import com.dianping.plumber.core.monitor.MonitorEvent;
 import com.dianping.plumber.exception.PlumberPipeTimeoutException;
 import com.dianping.plumber.utils.EnvUtils;
 import com.dianping.plumber.utils.StringUtils;
+import com.dianping.plumber.utils.TimeUtils;
 import com.dianping.plumber.view.ViewRenderer;
 
 /**
@@ -25,18 +29,35 @@ public class PlumberPipeWorker extends PlumberWorker {
     private final PlumberPagelet              pipe;
     private final LinkedBlockingQueue<String> pipeRenderResultQueue;
     private final boolean                     hasPriority;
+    private final Date                        startTime;
     private final ResultReturnedFlag          resultReturnedFlag;
+    private final MonitorEvent                monitorEvent;
 
     public PlumberPipeWorker(PlumberPipeDefinition definition,
                              Map<String, Object> paramsFromRequest,
                              Map<String, Object> paramsFromController, PlumberPagelet pipe,
-                             LinkedBlockingQueue<String> pipeRenderResultQueue,
-                             boolean hasPriority, ResultReturnedFlag resultReturnedFlag) {
+                             LinkedBlockingQueue<String> pipeRenderResultQueue, Date startTime,
+                             ResultReturnedFlag resultReturnedFlag) {
         super(definition, paramsFromRequest, paramsFromController);
         this.pipe = pipe;
+        this.hasPriority = false;
         this.pipeRenderResultQueue = pipeRenderResultQueue;
-        this.hasPriority = hasPriority;
+        this.startTime = startTime;
         this.resultReturnedFlag = resultReturnedFlag;
+        this.monitorEvent = null;
+    }
+
+    public PlumberPipeWorker(PlumberPipeDefinition definition,
+                             Map<String, Object> paramsFromRequest,
+                             Map<String, Object> paramsFromController, PlumberPagelet pipe,
+                             MonitorEvent monitorEvent) {
+        super(definition, paramsFromRequest, paramsFromController);
+        this.pipe = pipe;
+        this.hasPriority = true;
+        this.pipeRenderResultQueue = null;
+        this.startTime = null;
+        this.resultReturnedFlag = null;
+        this.monitorEvent = monitorEvent;
     }
 
     @Override
@@ -73,6 +94,13 @@ public class PlumberPipeWorker extends PlumberWorker {
 
         } finally {
 
+            if (resultReturnedFlag.isReturned()) {
+                logger.error(
+                    "can not return the pipe " + definition.getName() + "'s render result",
+                    new PlumberPipeTimeoutException());
+                return;
+            }
+
             if (!hasPriority) {
                 sendBackRenderResult(renderResult);
             } else {
@@ -83,16 +111,10 @@ public class PlumberPipeWorker extends PlumberWorker {
     }
 
     private void sendBackRenderResult(String renderResult) {
-
-        if (resultReturnedFlag.isReturned()) {
-            logger.error("can not return the pipe " + definition.getName() + "'s render result",
-                new PlumberPipeTimeoutException());
-            return;
-        }
-
         try {
             boolean insertResult = pipeRenderResultQueue.offer(renderResult,
-                PlumberConfig.getResponseTimeout(), TimeUnit.MILLISECONDS);
+                TimeUtils.getRemainingTime(startTime, PlumberConfig.getResponseTimeout()),
+                TimeUnit.MILLISECONDS);
             if (!insertResult) {
                 logger.error(
                     "can not return the pipe " + definition.getName() + "'s render result",
@@ -102,11 +124,10 @@ public class PlumberPipeWorker extends PlumberWorker {
             logger.error("can not return the pipe " + definition.getName() + "'s render result",
                 new PlumberPipeTimeoutException(e));
         }
-
     }
 
     private void signalMonitor(String renderResult) {
-        // to do
+        Monitor.signal(definition.getName(), renderResult, monitorEvent);
     }
 
 }

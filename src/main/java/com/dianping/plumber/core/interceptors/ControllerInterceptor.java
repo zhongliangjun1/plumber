@@ -5,16 +5,14 @@ import com.dianping.plumber.core.*;
 import com.dianping.plumber.core.definitions.PlumberControllerDefinition;
 import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
 import com.dianping.plumber.exception.PlumberRuntimeException;
-import com.dianping.plumber.utils.CollectionUtils;
-import com.dianping.plumber.utils.EnvUtils;
-import com.dianping.plumber.utils.MapUtils;
-import com.dianping.plumber.utils.ResponseUtils;
+import com.dianping.plumber.utils.*;
 import com.dianping.plumber.view.ViewRenderer;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,9 +67,11 @@ public class ControllerInterceptor implements Interceptor {
         if ( !CollectionUtils.isEmpty(pipeDefinitions) ) {
 
             int pipeNum = pipeDefinitions.size();
+            Date startTime = invocation.getStartTime();
+            long timeLimit = PlumberConfig.getResponseTimeout();
             LinkedBlockingQueue<String> pipeRenderResultQueue = invocation.getPipeRenderResultQueue();
-            while ( pipeNum>0 ) {
-                String pipeRenderResult = pipeRenderResultQueue.poll(PlumberConfig.getResponseTimeout(), TimeUnit.MILLISECONDS);
+            while ( pipeNum>0 && !TimeUtils.isTimeout(startTime, timeLimit) ) {
+                String pipeRenderResult = pipeRenderResultQueue.poll(TimeUtils.getRemainingTime(startTime, timeLimit), TimeUnit.MILLISECONDS);
                 if ( pipeRenderResult==null ) { // timeout
                     break;
                 }

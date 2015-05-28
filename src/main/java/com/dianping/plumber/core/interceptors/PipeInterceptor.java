@@ -1,17 +1,19 @@
 package com.dianping.plumber.core.interceptors;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.dianping.plumber.core.monitor.MonitorEvent;
 import org.apache.log4j.Logger;
 
 import com.dianping.plumber.core.*;
 import com.dianping.plumber.core.concurrent.Executor;
 import com.dianping.plumber.core.definitions.PlumberControllerDefinition;
 import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
+import com.dianping.plumber.core.monitor.Monitor;
+import com.dianping.plumber.core.monitor.MonitorEvent;
 import com.dianping.plumber.core.workers.PlumberPipeWorker;
 import com.dianping.plumber.exception.PlumberRuntimeException;
 import com.dianping.plumber.utils.CollectionUtils;
@@ -41,23 +43,31 @@ public class PipeInterceptor implements Interceptor {
             Map<String, Object> paramsFromController = invocation.getParamsForPagelets();
             LinkedBlockingQueue<String> pipeRenderResultQueue = invocation
                 .getPipeRenderResultQueue();
-            boolean hasPriority = controllerDefinition.isHasPriority();
+            Date startTime = invocation.getStartTime();
             ResultReturnedFlag resultReturnedFlag = invocation.getResultReturnedFlag();
+            boolean hasPriority = controllerDefinition.isHasPriority();
+            MonitorEvent monitorEvent = null;
+            if (hasPriority) {
+                monitorEvent = new MonitorEvent(pipeDefinitions, pipeRenderResultQueue, startTime,
+                    resultReturnedFlag);
+                Monitor.listen(monitorEvent);
+            }
 
             for (PlumberPipeDefinition definition : pipeDefinitions) {
                 String name = definition.getName();
                 PlumberPagelet pipe = (PlumberPagelet) invocation.getApplicationContext().getBean(
                     name);
                 injectAnnotationFields(pipe, definition, paramsFromRequest, paramsFromController);
-                PlumberPipeWorker pipeWorker = new PlumberPipeWorker(definition, paramsFromRequest,
-                    paramsFromController, pipe, pipeRenderResultQueue, hasPriority,
-                    resultReturnedFlag);
-
+                PlumberPipeWorker pipeWorker;
+                if (!hasPriority) {
+                    pipeWorker = new PlumberPipeWorker(definition, paramsFromRequest,
+                        paramsFromController, pipe, pipeRenderResultQueue, startTime,
+                        resultReturnedFlag);
+                } else {
+                    pipeWorker = new PlumberPipeWorker(definition, paramsFromRequest,
+                        paramsFromController, pipe, monitorEvent);
+                }
                 Executor.getInstance().submit(pipeWorker);
-            }
-
-            if (hasPriority) {
-                MonitorEvent monitorEvent = new MonitorEvent(pipeDefinitions);
             }
 
         }

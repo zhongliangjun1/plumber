@@ -3,11 +3,13 @@ package com.dianping.plumber.core;
 import static com.dianping.plumber.utils.ResponseUtils.disableNginxProxyBuffering;
 import static com.dianping.plumber.utils.ResponseUtils.setResponseContentType;
 
+import java.util.Date;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.dianping.plumber.utils.TimeUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -34,11 +36,13 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
                               Map<String, Object> paramsForController, HttpServletRequest request,
                               HttpServletResponse response) {
 
+        Date startTime = TimeUtils.getCurrentTime();
+
         validate(plumberControllerName, paramsForController, request, response);
 
         prepare(plumberControllerName, paramsForController, request, response);
 
-        return invoke(plumberControllerName, paramsForController, request, response);
+        return invoke(plumberControllerName, paramsForController, request, response, startTime);
     }
 
     private void validate(String plumberControllerName, Map<String, Object> paramsForController,
@@ -62,10 +66,10 @@ public class Plumber implements BeanFactoryPostProcessor, ApplicationContextAwar
 
     private ResultType invoke(String plumberControllerName,
                               Map<String, Object> paramsForController, HttpServletRequest request,
-                              HttpServletResponse response) {
+                              HttpServletResponse response, Date startTime) {
         try {
             InvocationContext invocationContext = new InvocationContext(plumberControllerName,
-                applicationContext, paramsForController, request, response);
+                applicationContext, paramsForController, request, response, startTime);
             return invocationContext.invoke();
         } catch (Exception e) {
             Exception runtimeException = new PlumberRuntimeException(e);

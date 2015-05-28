@@ -4,9 +4,12 @@
  */
 package com.dianping.plumber.core.monitor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
+import com.dianping.plumber.core.ResultReturnedFlag;
 import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
 
 /**
@@ -16,9 +19,44 @@ import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
 public class MonitorEvent {
 
     private final List<PlumberPipeDefinition> pipeDefinitions;
-    private final Date                        startTimeStamp = new Date();
+    private final Date                        startTime;
+    private final LinkedBlockingQueue<String> pipeRenderResultQueue;
+    private final ResultReturnedFlag          resultReturnedFlag;
 
-    public MonitorEvent(List<PlumberPipeDefinition> pipeDefinitions) {
+    private final List<MonitorNode>           monitorNodes;
+
+    public MonitorEvent(List<PlumberPipeDefinition> pipeDefinitions,
+                        LinkedBlockingQueue<String> pipeRenderResultQueue, Date startTime,
+                        ResultReturnedFlag resultReturnedFlag) {
         this.pipeDefinitions = pipeDefinitions;
+        this.pipeRenderResultQueue = pipeRenderResultQueue;
+        this.startTime = startTime;
+        this.resultReturnedFlag = resultReturnedFlag;
+        this.monitorNodes = new ArrayList<MonitorNode>(pipeDefinitions.size());
+        for (PlumberPipeDefinition definition : pipeDefinitions) {
+            MonitorNode monitorNode = new MonitorNode(definition.getName(),
+                definition.getPriority());
+            monitorNodes.add(monitorNode);
+        }
+    }
+
+    public List<PlumberPipeDefinition> getPipeDefinitions() {
+        return pipeDefinitions;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public LinkedBlockingQueue<String> getPipeRenderResultQueue() {
+        return pipeRenderResultQueue;
+    }
+
+    public ResultReturnedFlag getResultReturnedFlag() {
+        return resultReturnedFlag;
+    }
+
+    public List<MonitorNode> getMonitorNodes() {
+        return monitorNodes;
     }
 }

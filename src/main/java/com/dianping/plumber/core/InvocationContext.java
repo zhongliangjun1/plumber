@@ -1,9 +1,6 @@
 package com.dianping.plumber.core;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -37,26 +34,24 @@ public class InvocationContext {
     private final HttpServletResponse               response;
     private final LinkedBlockingQueue<String>       pipeRenderResultQueue  = new LinkedBlockingQueue<String>();
 
+    private final Date                              startTime;
     private final ResultReturnedFlag                resultReturnedFlag     = new ResultReturnedFlag();
-    private ResultType                              resultType;
 
     public InvocationContext(String controllerName, ApplicationContext applicationContext,
                              Map<String, Object> paramsForController, HttpServletRequest request,
-                             HttpServletResponse response) {
+                             HttpServletResponse response, Date startTime) {
         this.controllerName = controllerName;
         this.paramsForController = paramsForController;
         this.applicationContext = applicationContext;
         this.request = request;
         this.response = response;
         this.interceptors = getInterceptors();
+        this.startTime = startTime;
     }
 
     public ResultType invoke() throws Exception {
-        if (interceptors.hasNext()) {
-            final Interceptor interceptor = interceptors.next();
-            resultType = interceptor.intercept(this);
-        }
-        return resultType;
+        final Interceptor interceptor = interceptors.next();
+        return interceptor.intercept(this);
     }
 
     private Iterator<Interceptor> getInterceptors() {
@@ -101,6 +96,10 @@ public class InvocationContext {
 
     public HttpServletResponse getResponse() {
         return response;
+    }
+
+    public Date getStartTime() {
+        return startTime;
     }
 
     public ResultReturnedFlag getResultReturnedFlag() {
