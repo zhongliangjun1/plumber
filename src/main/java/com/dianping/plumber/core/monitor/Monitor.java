@@ -4,6 +4,7 @@
  */
 package com.dianping.plumber.core.monitor;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -23,10 +24,11 @@ import com.dianping.plumber.utils.TimeUtils;
  */
 public abstract class Monitor {
 
-    private static final Logger                            logger           = Logger
-                                                                                .getLogger(Monitor.class);
-    private static final LinkedBlockingQueue<MonitorEvent> eventsCacheQueue = new LinkedBlockingQueue<MonitorEvent>();
-    private static final List<MonitorEvent>                monitorEvents    = new LinkedList<MonitorEvent>();
+    private static final Logger                            logger            = Logger
+                                                                                 .getLogger(Monitor.class);
+    private static final LinkedBlockingQueue<MonitorEvent> eventsCacheQueue  = new LinkedBlockingQueue<MonitorEvent>();
+    private static final List<MonitorEvent>                monitorEvents     = new LinkedList<MonitorEvent>();
+    private static final List<MonitorEvent>                ineffectiveEvents = new ArrayList<MonitorEvent>();
 
     static {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -80,11 +82,52 @@ public abstract class Monitor {
     }
 
     private static void monitor() {
+        for (MonitorEvent monitorEvent : monitorEvents) {
 
+            if (!isEffectiveEvents(monitorEvent)) {
+                ineffectiveEvents.add(monitorEvent);
+                continue;
+            }
+
+            List<MonitorNode> monitorNodes = monitorEvent.getMonitorNodes();
+            for (MonitorNode monitorNode : monitorNodes) {
+                Status nodeStatus = monitorNode.getNodeStatus();
+
+                if (Status.INPROCESS == nodeStatus)
+                    break;
+
+                if (Status.SUBMIT == nodeStatus) {
+                    String renderResult = monitorNode.getRenderResult();
+                    LinkedBlockingQueue<String> pipeRenderResultQueue = monitorEvent
+                        .getPipeRenderResultQueue();
+                    boolean result = pipeRenderResultQueue.offer(renderResult);
+                    if (result)
+                        monitorNode.setNodeStatus(Status.FINISH);
+                    continue;
+                }
+
+                if (Status.FINISH == nodeStatus)
+                    continue;
+            }
+
+        }
+    }
+
+    private static boolean isEffectiveEvents(MonitorEvent monitorEvent) {
+        if (monitorEvent.getResultReturnedFlag().isReturned())
+            return false;
+
+        if (TimeUtils.isTimeout(monitorEvent.getStartTime(), PlumberConfig.getResponseTimeout()))
+            return false;
+
+        return true;
     }
 
     private static void clear() {
-
+        for (MonitorEvent ineffectiveEvent : ineffectiveEvents) {
+            monitorEvents.remove(ineffectiveEvent);
+        }
+        ineffectiveEvents.clear();
     }
 
 }
