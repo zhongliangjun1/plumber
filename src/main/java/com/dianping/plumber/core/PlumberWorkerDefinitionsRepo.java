@@ -189,7 +189,7 @@ public class PlumberWorkerDefinitionsRepo {
 
                         List<String> pipeNames = getPipeNames(controllerName, viewSource);
                         if (!CollectionUtils.isEmpty(pipeNames)) {
-                            Boolean hasPriority = false;
+                            Boolean hasPriority = null;
                             List<PlumberPipeDefinition> pipeDefinitions = new ArrayList<PlumberPipeDefinition>();
                             List<String> cleanPipeNames = new ArrayList<String>();
                             for (String pipeName : pipeNames) {

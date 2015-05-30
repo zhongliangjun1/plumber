@@ -5,6 +5,7 @@
 package com.dianping.plumber.core.monitor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -38,6 +39,7 @@ public class MonitorEvent {
                 definition.getPriority());
             monitorNodes.add(monitorNode);
         }
+        Collections.sort(monitorNodes);
     }
 
     public List<PlumberPipeDefinition> getPipeDefinitions() {

@@ -50,13 +50,13 @@ public class PlumberPipeWorker extends PlumberWorker {
     public PlumberPipeWorker(PlumberPipeDefinition definition,
                              Map<String, Object> paramsFromRequest,
                              Map<String, Object> paramsFromController, PlumberPagelet pipe,
-                             MonitorEvent monitorEvent) {
+                             MonitorEvent monitorEvent, ResultReturnedFlag resultReturnedFlag) {
         super(definition, paramsFromRequest, paramsFromController);
         this.pipe = pipe;
         this.hasPriority = true;
         this.pipeRenderResultQueue = null;
         this.startTime = null;
-        this.resultReturnedFlag = null;
+        this.resultReturnedFlag = resultReturnedFlag;
         this.monitorEvent = monitorEvent;
     }
 

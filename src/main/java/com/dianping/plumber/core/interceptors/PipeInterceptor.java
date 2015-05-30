@@ -65,7 +65,7 @@ public class PipeInterceptor implements Interceptor {
                         resultReturnedFlag);
                 } else {
                     pipeWorker = new PlumberPipeWorker(definition, paramsFromRequest,
-                        paramsFromController, pipe, monitorEvent);
+                        paramsFromController, pipe, monitorEvent, resultReturnedFlag);
                 }
                 Executor.getInstance().submit(pipeWorker);
             }
