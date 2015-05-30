@@ -1,19 +1,14 @@
 package com.dianping.plumber.core.workers;
 
-import com.dianping.plumber.core.PlumberGlobals;
-import com.dianping.plumber.core.PlumberPagelet;
-import com.dianping.plumber.core.PlumberWorkerDefinitionsRepo;
-import com.dianping.plumber.core.ResultType;
-import com.dianping.plumber.core.definitions.PlumberBarrierDefinition;
-import com.dianping.plumber.core.workers.PlumberWorker;
-import com.dianping.plumber.utils.EnvUtils;
-import com.dianping.plumber.utils.StringUtils;
-import com.dianping.plumber.view.ViewRenderer;
-import org.apache.commons.lang.exception.ExceptionUtils;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+
+import com.dianping.plumber.core.PlumberGlobals;
+import com.dianping.plumber.core.PlumberPagelet;
+import com.dianping.plumber.core.ResultType;
+import com.dianping.plumber.core.definitions.PlumberBarrierDefinition;
+import com.dianping.plumber.utils.ViewRenderUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,14 +19,13 @@ import java.util.concurrent.CountDownLatch;
  */
 public class PlumberBarrierWorker extends PlumberWorker {
 
-    private final CountDownLatch latch;
-    private final PlumberPagelet barrier;
-    private final ConcurrentHashMap<String,String> barrierRenderResults;
+    private final CountDownLatch                    latch;
+    private final PlumberPagelet                    barrier;
+    private final ConcurrentHashMap<String, String> barrierRenderResults;
 
     public PlumberBarrierWorker(PlumberBarrierDefinition definition,
                                 Map<String, Object> paramsFromRequest,
-                                Map<String, Object> paramsFromController,
-                                CountDownLatch latch,
+                                Map<String, Object> paramsFromController, CountDownLatch latch,
                                 PlumberPagelet barrier,
                                 ConcurrentHashMap<String, String> barrierRenderResults) {
         super(definition, paramsFromRequest, paramsFromController);
@@ -43,42 +37,28 @@ public class PlumberBarrierWorker extends PlumberWorker {
     @Override
     public void run() {
 
-        String name = definition.getName();
         String renderResult = PlumberGlobals.EMPTY_RENDER_RESULT;
+        String name = definition.getName();
 
         try {
 
-            ResultType resultType = barrier.execute(paramsFromRequest, paramsFromController, modelForView);
+            ResultType resultType = barrier.execute(paramsFromRequest, paramsFromController,
+                modelForView);
 
-            if ( resultType==ResultType.SUCCESS ) {
-                String viewSource = definition.getViewSource();
-                if ( EnvUtils.isDev() ) { // for refresh
-                    String viewPath = definition.getViewPath();
-                    viewSource = PlumberWorkerDefinitionsRepo.getViewSourceLoader().load(viewPath);
-                }
-                ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
-                String result = viewRenderer.render(name, viewSource, modelForView);
-                if ( StringUtils.isNotEmpty(result) )
-                    renderResult = result;
-            }
+            if (resultType == ResultType.SUCCESS)
+                renderResult = ViewRenderUtils.getViewRenderResult(definition, modelForView);
 
         } catch (Exception e) {
 
-            if ( EnvUtils.isDev() ) {
-                String result = ExceptionUtils.getFullStackTrace(e);
-                if ( StringUtils.isNotEmpty(result) )
-                    renderResult = result;
-            }
-
-            String msg = "barrier " + name + " execute failure";
-            logger.error(msg, e);
+            renderResult = ViewRenderUtils.getViewRenderResultWhenExceptionHappen(e);
+            logger.error("barrier " + name + " execute failure", e);
 
         } finally {
 
             try {
                 barrierRenderResults.put(name, renderResult);
             } catch (Exception e) {
-                logger.error("I don't know what would happen, but just to make sure latch.countDown() can be executed all the time ", e);
+                logger.error("put renderResult to barrierRenderResults error", e);
             }
 
             latch.countDown();

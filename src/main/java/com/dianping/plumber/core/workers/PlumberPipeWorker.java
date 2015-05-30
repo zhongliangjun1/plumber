@@ -5,18 +5,17 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
-
 import com.dianping.plumber.config.PlumberConfig;
-import com.dianping.plumber.core.*;
+import com.dianping.plumber.core.PlumberGlobals;
+import com.dianping.plumber.core.PlumberPagelet;
+import com.dianping.plumber.core.ResultReturnedFlag;
+import com.dianping.plumber.core.ResultType;
 import com.dianping.plumber.core.definitions.PlumberPipeDefinition;
 import com.dianping.plumber.core.monitor.Monitor;
 import com.dianping.plumber.core.monitor.MonitorEvent;
 import com.dianping.plumber.exception.PlumberPipeTimeoutException;
-import com.dianping.plumber.utils.EnvUtils;
-import com.dianping.plumber.utils.StringUtils;
 import com.dianping.plumber.utils.TimeUtils;
-import com.dianping.plumber.view.ViewRenderer;
+import com.dianping.plumber.utils.ViewRenderUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -64,33 +63,16 @@ public class PlumberPipeWorker extends PlumberWorker {
     public void run() {
         String renderResult = PlumberGlobals.EMPTY_RENDER_RESULT;
         try {
+
             ResultType resultType = pipe.execute(paramsFromRequest, paramsFromController,
                 modelForView);
-            if (resultType == ResultType.SUCCESS) {
-                String name = definition.getName();
-                String viewSource = definition.getViewSource();
-                if (EnvUtils.isDev()) { // for refresh
-                    String viewPath = definition.getViewPath();
-                    viewSource = PlumberWorkerDefinitionsRepo.getViewSourceLoader().load(viewPath);
-                }
-                ViewRenderer viewRenderer = PlumberWorkerDefinitionsRepo.getViewRenderer();
-                String result = viewRenderer.render(name, viewSource, modelForView);
-                if (StringUtils.isNotEmpty(result))
-                    renderResult = result;
-            }
+            if (resultType == ResultType.SUCCESS)
+                renderResult = ViewRenderUtils.getViewRenderResult(definition, modelForView);
+
         } catch (Exception e) {
 
+            renderResult = ViewRenderUtils.getViewRenderResultWhenExceptionHappen(e);
             logger.error("pipe " + definition.getName() + " execute failure", e);
-
-            if (EnvUtils.isDev()) {
-                try {
-                    String result = ExceptionUtils.getFullStackTrace(e);
-                    if (StringUtils.isNotEmpty(result))
-                        renderResult = result;
-                } catch (Exception e1) {
-                    logger.error("can not get the exception full stack trace", e1);
-                }
-            }
 
         } finally {
 
@@ -112,10 +94,10 @@ public class PlumberPipeWorker extends PlumberWorker {
 
     private void sendBackRenderResult(String renderResult) {
         try {
-            boolean insertResult = pipeRenderResultQueue.offer(renderResult,
+            boolean result = pipeRenderResultQueue.offer(renderResult,
                 TimeUtils.getRemainingTime(startTime, PlumberConfig.getResponseTimeout()),
                 TimeUnit.MILLISECONDS);
-            if (!insertResult) {
+            if (!result) {
                 logger.error(
                     "can not return the pipe " + definition.getName() + "'s render result",
                     new PlumberPipeTimeoutException());
