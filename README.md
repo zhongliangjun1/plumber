@@ -25,7 +25,7 @@
 
 
 
-##Getting Started
+##Get Started
 
 ###1) 添加 pom 依赖
 
