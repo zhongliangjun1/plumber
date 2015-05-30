@@ -448,14 +448,14 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 现在在 **plumber** 中要实现这样的效果非常简单，你只需要在指定 **pb-pipe** name 的同时，像下面这样指定它的优先级即可：
 
-	<div class="hide" pb-pipe="mobileFirstPipe@1"></div>
-    <div class="hide" pb-pipe="mobileSecondPipe@2"></div>
-    <div class="hide" pb-pipe="mobileThirdPipe@3"></div>
-    <div class="hide" pb-pipe="mobileFourthPipe@4"></div>
+	<div class="hide" pb-pipe="mobileFirstPipe@4000"></div>
+    <div class="hide" pb-pipe="mobileSecondPipe@3000"></div>
+    <div class="hide" pb-pipe="mobileThirdPipe@2000"></div>
+    <div class="hide" pb-pipe="mobileFourthPipe@1000"></div>
     
-**@** 后面指定的优先级就如同优先级队列中的下标，从1开始，依次往后。指定 **pagelet** 的优先级之后，**plumber** 便会按照你指定的顺序来返回这些 **pagelet** 。
+**@** 后面指定的优先级就跟 css 中的 z-index 类似，权值越大，优先级越高。指定 **pagelet** 的优先级之后，**plumber** 便会按照你指定的顺序来返回这些 **pagelet** 。
 
-需要注意的是，优先级数字顺序不可以跳过；采取指定优先级的方式后，不可以存在部分 **pipe** 类型的 **pagelet** 不指定优先级。
+需要注意的是，采取指定优先级的方式后，你需要为该页面所有的 **pipe** 类型的 **pagelet** 均指定优先级，不可以有些指定有些不指定。
 
 ###4）通过 spring xml 配置 pagelet 信息
 
@@ -471,10 +471,10 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
     	</property>
     	<property name="pipeNames">
         	<list value-type="java.lang.String">
-            	<value>mobileFirstPipe@1</value>
-            	<value>mobileSecondPipe@2</value>
-            	<value>mobileThirdPipe@3</value>
-            	<value>mobileFourthPipe@4</value>
+            	<value>mobileFirstPipe@4000</value>
+            	<value>mobileSecondPipe@3000</value>
+            	<value>mobileThirdPipe@2000</value>
+            	<value>mobileFourthPipe@1000</value>
         	</list>
     	</property>
 	</bean>
@@ -485,7 +485,7 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 因为服务端内容在第一次 flush 到客户端后，resposne header 便不可再被修改（客户端已经读取 header 内容了），所以在 **pipe** 类型的 pagelet 中不可再对 response header 进行相关修改操作，如添加、修改 cookie 等。
 
-###6）plumber.js 不再久久等待 dom ready
+###6）plumber.js 让你的 js 执行不用再久久等待 dom ready
 
 将你的静态资源引用作为第一次 **chunked** 输出，可以让你的静态资源提前得到加载，但如果你的 js 需要等待 dom ready 事件，那么你将面临你的 js 在所有 **pipe** 类型的 pagelet 抵达前均无法得到执行。如此所有你提前发送到客户端的 pagelet 将都陷入能看，却没有绑定 js 事件的境地。
 
@@ -577,4 +577,7 @@ headBarrier 和 rightBarrier 将以并发的方式得到执行，待他们都执
 
 * [Feature] 现在在 **dev** 环境下，**FreemarkerRenderer** 会在页面模板文件动态刷新后始终 render 最新的模板。
 
-
+####1.7.0
+* [Change] 重构了门面类 **plumber.java**，代码更精简了。
+* [Feature] 原来指定 **pipe** 返回顺序的方式类似于指定数组下标，这种方式的问题在于改动一处下标后，后续的下标都需要更改，太麻烦。现在改成类似于 css 中 **z-index** 的方式，**@** 后的数值越大，优先级越高，返回越早。
+* [Feature] 原来控制 **pipe** 返回顺序的方式是在 **worker** 线程中通过 **lock** 和 **condition** 来实现，这种实现方式存在 **worker** 线程利用率不高和过度锁竞争的问题。在 1.7.0 中引入了 **monitor** 的概念，**pipe** 类型的 task **worker** 做完之后，会直接 commit 给 **monitor**，由 **monitor** 去接管控制返回顺序的问题，**worker** 解放出来继续去做其他的事情。在 **monitor** 中实现了一个 **event loop** 来控制保证 **pipe** 的返回顺序。
