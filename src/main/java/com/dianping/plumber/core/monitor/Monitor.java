@@ -35,11 +35,14 @@ public abstract class Monitor {
         executorService.execute(new Runnable() {
             @Override
             public void run() {
+
+                // event loop
                 while (true) {
                     add();
                     monitor();
                     clear();
                 }
+
             }
         });
     }
