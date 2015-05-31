@@ -32,7 +32,7 @@
 	<dependency>
 	  <groupId>com.dianping</groupId>
 	  <artifactId>plumber</artifactId>
-	  <version>1.6.0</version>
+	  <version>{latest-version}</version>
 	</dependency>
 	
 ###2) 添加 plumber.yaml 配置
