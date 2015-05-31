@@ -46,17 +46,17 @@ public class PipeInterceptor implements Interceptor {
             Date startTime = invocation.getStartTime();
             ResultReturnedFlag resultReturnedFlag = invocation.getResultReturnedFlag();
             boolean hasPriority = controllerDefinition.isHasPriority();
+
             MonitorEvent monitorEvent = null;
-            if (hasPriority) {
+            if (hasPriority) { // commit a monitorEvent to monitor which will make sure pipes responded in order with their priority
                 monitorEvent = new MonitorEvent(pipeDefinitions, pipeRenderResultQueue, startTime,
                     resultReturnedFlag);
                 Monitor.listen(monitorEvent);
             }
 
             for (PlumberPipeDefinition definition : pipeDefinitions) {
-                String name = definition.getName();
                 PlumberPagelet pipe = (PlumberPagelet) invocation.getApplicationContext().getBean(
-                    name);
+                    definition.getName());
                 injectAnnotationFields(pipe, definition, paramsFromRequest, paramsFromController);
                 PlumberPipeWorker pipeWorker;
                 if (!hasPriority) {

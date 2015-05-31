@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.dianping.plumber.config.PlumberConfig;
+import com.dianping.plumber.core.concurrent.PlumberMonitorThreadFactory;
 import com.dianping.plumber.utils.CollectionUtils;
 import com.dianping.plumber.utils.TimeUtils;
 
@@ -31,7 +32,8 @@ public abstract class Monitor {
     private static final List<MonitorEvent>                ineffectiveEvents = new ArrayList<MonitorEvent>();
 
     static {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ExecutorService executorService = Executors
+            .newSingleThreadExecutor(new PlumberMonitorThreadFactory());
         executorService.execute(new Runnable() {
             @Override
             public void run() {

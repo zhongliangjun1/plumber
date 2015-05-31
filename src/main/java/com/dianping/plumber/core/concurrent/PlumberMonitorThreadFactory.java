@@ -4,13 +4,10 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created with IntelliJ IDEA.
- * User: liming_liu
- * Date: 14/12/24
- * Time: 下午2:58
- * To change this template use File | Settings | File Templates.
+ * @author zhongliangjun1@gmail.com
+ * @version $Id: Monitor.java, v 0.1 5/23/15 11:33 PM liangjun.zhong Exp $$
  */
-public class PlumberThreadFactory implements ThreadFactory {
+public class PlumberMonitorThreadFactory implements ThreadFactory {
 
     private static final AtomicInteger poolNumber = new AtomicInteger(1);
     private final AtomicInteger        threadNumber;
@@ -18,15 +15,15 @@ public class PlumberThreadFactory implements ThreadFactory {
     private final String               namePrefix;
     private final boolean              isDaemon;
 
-    public PlumberThreadFactory() {
-        this("Plumber-Pool");
+    public PlumberMonitorThreadFactory() {
+        this("Plumber-Monitor-Pool");
     }
 
-    public PlumberThreadFactory(String name) {
+    public PlumberMonitorThreadFactory(String name) {
         this(name, true);
     }
 
-    public PlumberThreadFactory(String prefix, boolean daemon) {
+    public PlumberMonitorThreadFactory(String prefix, boolean daemon) {
         this.threadNumber = new AtomicInteger(1);
         this.group = new ThreadGroup(prefix + "-" + poolNumber.getAndIncrement() + "-threadGroup");
         this.namePrefix = prefix + "-" + poolNumber.getAndIncrement() + "-thread-";
