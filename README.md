@@ -38,6 +38,9 @@
 ###2) 添加 plumber.yaml 配置
 在 **resources** 下添加 plumber.yaml 配置文件 ：
 
+	response:
+    	contentType: text/html;charset=UTF-8
+    	timeout: 3000
 	view:
 	    encoding: UTF-8
 	    viewSourceLoaderFactory: com.dianping.plumber.view.support.loader.ViewSourceUnderClassPathLoaderFactory
